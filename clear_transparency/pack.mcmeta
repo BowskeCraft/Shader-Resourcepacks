@@ -1,0 +1,12 @@
+{
+	"pack":{
+		"min_format": 84,
+		"max_format": 86,
+		"pack_name":"Clear Transparency",
+		"description":[	
+			{"text":"Clear Transparency ","color":"#88aaFF","bold":true},
+			{"text":"\nby ","bold":false},
+			{"text":"\u03b2\u00f8\u026f\u0219\u006b\u0065's CraftRoom\n","color":"#7E7664"}
+		]
+	}
+}
