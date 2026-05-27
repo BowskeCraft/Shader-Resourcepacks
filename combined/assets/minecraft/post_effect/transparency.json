@@ -1,0 +1,169 @@
+{
+    "targets" : {
+        "primary":{},
+        "secondary":{}
+    },
+    "passes": [
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/transparency",
+            "inputs": [
+                {
+                    "sampler_name": "Main",
+                    "target": "minecraft:main"
+                },
+                {
+                    "sampler_name": "MainDepth",
+                    "target": "minecraft:main",
+                    "use_depth_buffer": true
+                },
+                {
+                    "sampler_name": "Translucent",
+                    "target": "minecraft:translucent"
+                },
+                {
+                    "sampler_name": "TranslucentDepth",
+                    "target": "minecraft:translucent",
+                    "use_depth_buffer": true
+                },
+                {
+                    "sampler_name": "ItemEntity",
+                    "target": "minecraft:item_entity"
+                },
+                {
+                    "sampler_name": "ItemEntityDepth",
+                    "target": "minecraft:item_entity",
+                    "use_depth_buffer": true
+                },
+                {
+                    "sampler_name": "Particles",
+                    "target": "minecraft:particles"
+                },
+                {
+                    "sampler_name": "ParticlesDepth",
+                    "target": "minecraft:particles",
+                    "use_depth_buffer": true
+                },
+                {
+                    "sampler_name": "Clouds",
+                    "target": "minecraft:clouds"
+                },
+                {
+                    "sampler_name": "CloudsDepth",
+                    "target": "minecraft:clouds",
+                    "use_depth_buffer": true
+                },
+                {
+                    "sampler_name": "Weather",
+                    "target": "minecraft:weather"
+                },
+                {
+                    "sampler_name": "WeatherDepth",
+                    "target": "minecraft:weather",
+                    "use_depth_buffer": true
+                }
+            ],
+            "output": "primary"
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/blit",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "primary"
+                }
+            ],
+            "uniforms": {
+                "BlitConfig": [
+                    {
+                        "name": "ColorModulate",
+                        "type": "vec4",
+                        "value": [ 1.0, 1.0, 1.0, 1.0 ]
+                    }
+                ]
+            },
+            "output": "minecraft:main"
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/dof",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "minecraft:main",
+                    "bilinear": true
+                },
+                {
+                    "sampler_name": "InDepth",
+                    "target": "minecraft:main",
+                    "use_depth_buffer": true
+                }
+            ],
+            "uniforms": {
+                "DoFOptions":[
+                    {
+                        "name":"DoFStrength",
+                        "type":"float",
+                        "value":25.0
+                    },{
+                        "name":"FocusMin",
+                        "type":"float",
+                        "value":0.5
+                    },{
+                        "name":"FocusMax",
+                        "type":"float",
+                        "value":0.99
+                    }
+                ]
+            },
+            "output": "secondary"
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/chromatic_aberration",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "secondary",
+                    "bilinear": true
+                }
+            ],
+            "uniforms": {
+                "ChromAbbrConfig":[
+                    {
+                        "name": "ResizeScale",
+                        "type": "float",
+                        "value": 1.02
+                    },
+                    {
+                        "name": "DistortStrength",
+                        "type": "vec3",
+                        "value": [ 0.05, 0.06, 0.07 ]
+                    }
+                ]
+            },
+            "output": "primary"
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/blit",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "primary"
+                }
+            ],
+            "uniforms": {
+                "BlitConfig": [
+                    {
+                        "name": "ColorModulate",
+                        "type": "vec4",
+                        "value": [ 1.0, 1.0, 1.0, 1.0 ]
+                    }
+                ]
+            },
+            "output": "minecraft:main"
+        }
+    ]
+}
