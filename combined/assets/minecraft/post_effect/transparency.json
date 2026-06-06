@@ -2,7 +2,14 @@
     "targets" : {
         "primary":{},
         "secondary":{},
-        "nearest_depth":{}
+        "reflection_0":{
+            "width": 720,
+            "height": 480
+        },
+        "reflection_1":{
+            "width": 720,
+            "height": 480
+        }
     },
     "passes": [
         {
@@ -85,6 +92,82 @@
                     "use_depth_buffer": true
                 }
             ],
+            "output": "reflection_0"
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/box_blur",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "reflection_0",
+                    "bilinear": true
+                }
+            ],
+            "output": "reflection_1",
+            "uniforms": {
+                "BlurConfig": [
+                    {
+                        "name": "BlurDir",
+                        "type": "vec2",
+                        "value": [ 1.0, 0.0 ]
+                    },
+                    {
+                        "name": "Radius",
+                        "type": "float",
+                        "value": 1.0
+                    }
+                ]
+            }
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/box_blur",
+            "inputs": [
+                {
+                    "sampler_name": "In",
+                    "target": "reflection_1",
+                    "bilinear": true
+                }
+            ],
+            "output": "reflection_0",
+            "uniforms": {
+                "BlurConfig": [
+                    {
+                        "name": "BlurDir",
+                        "type": "vec2",
+                        "value": [ 0.0, 1.0 ]
+                    },
+                    {
+                        "name": "Radius",
+                        "type": "float",
+                        "value": 1.0
+                    }
+                ]
+            }
+        },
+        {
+            "vertex_shader": "minecraft:core/screenquad",
+            "fragment_shader": "minecraft:post/mix",
+            "inputs": [
+                {
+                    "sampler_name": "Base",
+                    "target":"primary"
+                },
+                {
+                    "sampler_name": "Overlay",
+                    "target": "reflection_0"
+                }
+            ],
+            "uniforms": {
+                "MixConfig":[
+                    {
+                        "name": "MixAlpha",
+                        "type": "float",
+                        "value": 0.75
+                    }
+                ]
+            },
             "output": "secondary"
         },
         {
