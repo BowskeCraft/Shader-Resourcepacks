@@ -27,6 +27,18 @@ float my_smoothstep(float x){
     //return x * x * x * (x * (x * 6. - 15.) + 10.);
     return x * x * (3.0 - x* 2.0);
 }
+vec2 my_smoothstep(vec2 x){
+    //return x * x * x * (x * (x * 6. - 15.) + 10.);
+    return vec2(my_smoothstep(x.x),my_smoothstep(x.y));
+}
+vec3 my_smoothstep(vec3 x){
+    //return x * x * x * (x * (x * 6. - 15.) + 10.);
+    return vec3(my_smoothstep(x.x),my_smoothstep(x.y),my_smoothstep(x.z));
+}
+vec4 my_smoothstep(vec4 x){
+    //return x * x * x * (x * (x * 6. - 15.) + 10.);
+    return vec4(my_smoothstep(x.x),my_smoothstep(x.y),my_smoothstep(x.z),my_smoothstep(x.w));
+}
 
 float perlin_noise(vec2 p){
 
@@ -50,17 +62,18 @@ float perlin_noise(vec2 p){
     uint hx  = pcg_hash(p3x)  ;
     uint hy  = pcg_hash(p3y)  ;
     uint hxy = pcg_hash(p3xy) ;
+
+    vec2 v   = p - p3;
+    vec2 vx  = p - p3x;
+    vec2 vy  = p - p3y;
+    vec2 vxy = p - p3xy;
     
-    float c    = dot(p - p3  , corners[h   & 3u] );
-    float cx   = dot(p - p3x , corners[hx  & 3u] );
-    float cy   = dot(p - p3y , corners[hy  & 3u] );
-    float cxy  = dot(p - p3xy, corners[hxy & 3u] );
+    float c    = dot( v  , corners[h   & 3u] );
+    float cx   = dot( vx , corners[hx  & 3u] );
+    float cy   = dot( vy , corners[hy  & 3u] );
+    float cxy  = dot( vxy, corners[hxy & 3u] );
 
-    vec2 ratio;
-
-    //ratio.xy = vec2(fract(p.x),fract(p.y));
-
-    ratio.xy = vec2(my_smoothstep(fract(p.x)),my_smoothstep(fract(p.y)));
+    vec2 ratio = my_smoothstep(v);
 
     float val = mix(mix(c,cx,ratio.x),mix(cy,cxy,ratio.x),ratio.y);
 
@@ -93,21 +106,26 @@ float perlin_noise(vec3 p){
     uint hxz  = pcg_hash(p3xz) ;
     uint hyz  = pcg_hash(p3yz) ;
     uint hxyz = pcg_hash(p3xyz);
+
+    vec3 v    = p - p3   ;
+    vec3 vx   = p - p3x  ;
+    vec3 vy   = p - p3y  ;
+    vec3 vxy  = p - p3xy ;
+    vec3 vz   = p - p3z  ;
+    vec3 vxz  = p - p3xz ;
+    vec3 vyz  = p - p3yz ;
+    vec3 vxyz = p - p3xyz;
     
-    float c    = dot(p - p3  ,  corners[h    & 7u] );
-    float cx   = dot(p - p3x ,  corners[hx   & 7u] );
-    float cy   = dot(p - p3y ,  corners[hy   & 7u] );
-    float cxy  = dot(p - p3xy,  corners[hxy  & 7u] );
-    float cz   = dot(p - p3z  , corners[hz   & 7u] );
-    float cxz  = dot(p - p3xz , corners[hxz  & 7u] );
-    float cyz  = dot(p - p3yz , corners[hyz  & 7u] );
-    float cxyz = dot(p - p3xyz, corners[hxyz & 7u] );
+    float c    = dot( v  ,  corners[h    & 7u] );
+    float cx   = dot( vx ,  corners[hx   & 7u] );
+    float cy   = dot( vy ,  corners[hy   & 7u] );
+    float cxy  = dot( vxy,  corners[hxy  & 7u] );
+    float cz   = dot( vz  , corners[hz   & 7u] );
+    float cxz  = dot( vxz , corners[hxz  & 7u] );
+    float cyz  = dot( vyz , corners[hyz  & 7u] );
+    float cxyz = dot( vxyz, corners[hxyz & 7u] );
 
-    vec3 ratio;
-
-    //ratio.xy = vec2(fract(p.x),fract(p.y));
-
-    ratio.xyz = vec3(my_smoothstep(fract(p.x)),my_smoothstep(fract(p.y)),my_smoothstep(fract(p.z)));
+    vec3 ratio = my_smoothstep(v);
 
     float val = mix(
         mix(
@@ -145,16 +163,17 @@ vec2 perlin_noise_2d(vec2 p){
     uint hy  = pcg_hash(p3y)  ;
     uint hxy = pcg_hash(p3xy) ;
     
-    vec2 c    = vec2( dot(p - p3  , corners[h   & 3u] ), dot(p - p3  , corners[(h  >> 2) & 3u] ) );
-    vec2 cx   = vec2( dot(p - p3x , corners[hx  & 3u] ), dot(p - p3x , corners[(hx >> 2) & 3u] ) );
-    vec2 cy   = vec2( dot(p - p3y , corners[hy  & 3u] ), dot(p - p3y , corners[(hy >> 2) & 3u] ) );
-    vec2 cxy  = vec2( dot(p - p3xy, corners[hxy & 3u] ), dot(p - p3xy, corners[(hxy>> 2) & 3u] ) );
+    vec2 v   = p - p3;
+    vec2 vx  = p - p3x;
+    vec2 vy  = p - p3y;
+    vec2 vxy = p - p3xy;
 
-    vec2 ratio;
+    vec2 c    = vec2( dot( v  , corners[h   & 3u] ), dot( v  , corners[(h  >> 2) & 3u] ) );
+    vec2 cx   = vec2( dot( vx , corners[hx  & 3u] ), dot( vx , corners[(hx >> 2) & 3u] ) );
+    vec2 cy   = vec2( dot( vy , corners[hy  & 3u] ), dot( vy , corners[(hy >> 2) & 3u] ) );
+    vec2 cxy  = vec2( dot( vxy, corners[hxy & 3u] ), dot( vxy, corners[(hxy>> 2) & 3u] ) );
 
-    //ratio.xy = vec2(fract(p.x),fract(p.y));
-
-    ratio.xy = vec2(my_smoothstep(fract(p.x)),my_smoothstep(fract(p.y)));
+    vec2 ratio = my_smoothstep(v);
 
     vec2 val = mix(mix(c,cx,ratio.x),mix(cy,cxy,ratio.x),ratio.y);
 
@@ -187,21 +206,27 @@ vec2 perlin_noise_2d(vec3 p){
     uint hxz  = pcg_hash(p3xz) ;
     uint hyz  = pcg_hash(p3yz) ;
     uint hxyz = pcg_hash(p3xyz);
+
+    vec3 v    = p - p3   ;
+    vec3 vx   = p - p3x  ;
+    vec3 vy   = p - p3y  ;
+    vec3 vxy  = p - p3xy ;
+    vec3 vz   = p - p3z  ;
+    vec3 vxz  = p - p3xz ;
+    vec3 vyz  = p - p3yz ;
+    vec3 vxyz = p - p3xyz;
+
     
-    vec2 c    = vec2( dot(p - p3  ,  corners[h    & 7u] ),dot(p - p3  ,  corners[(h    >> 3) & 7u] ) );
-    vec2 cx   = vec2( dot(p - p3x ,  corners[hx   & 7u] ),dot(p - p3x ,  corners[(hx   >> 3) & 7u] ) );
-    vec2 cy   = vec2( dot(p - p3y ,  corners[hy   & 7u] ),dot(p - p3y ,  corners[(hy   >> 3) & 7u] ) );
-    vec2 cxy  = vec2( dot(p - p3xy,  corners[hxy  & 7u] ),dot(p - p3xy,  corners[(hxy  >> 3) & 7u] ) );
-    vec2 cz   = vec2( dot(p - p3z  , corners[hz   & 7u] ),dot(p - p3z  , corners[(hz   >> 3) & 7u] ) );
-    vec2 cxz  = vec2( dot(p - p3xz , corners[hxz  & 7u] ),dot(p - p3xz , corners[(hxz  >> 3) & 7u] ) );
-    vec2 cyz  = vec2( dot(p - p3yz , corners[hyz  & 7u] ),dot(p - p3yz , corners[(hyz  >> 3) & 7u] ) );
-    vec2 cxyz = vec2( dot(p - p3xyz, corners[hxyz & 7u] ),dot(p - p3xyz, corners[(hxyz >> 3) & 7u] ) );
+    vec2 c    = vec2( dot( v  ,  corners[h    & 7u] ),dot( v  ,  corners[(h    >> 3) & 7u] ) );
+    vec2 cx   = vec2( dot( vx ,  corners[hx   & 7u] ),dot( vx ,  corners[(hx   >> 3) & 7u] ) );
+    vec2 cy   = vec2( dot( vy ,  corners[hy   & 7u] ),dot( vy ,  corners[(hy   >> 3) & 7u] ) );
+    vec2 cxy  = vec2( dot( vxy,  corners[hxy  & 7u] ),dot( vxy,  corners[(hxy  >> 3) & 7u] ) );
+    vec2 cz   = vec2( dot( vz  , corners[hz   & 7u] ),dot( vz  , corners[(hz   >> 3) & 7u] ) );
+    vec2 cxz  = vec2( dot( vxz , corners[hxz  & 7u] ),dot( vxz , corners[(hxz  >> 3) & 7u] ) );
+    vec2 cyz  = vec2( dot( vyz , corners[hyz  & 7u] ),dot( vyz , corners[(hyz  >> 3) & 7u] ) );
+    vec2 cxyz = vec2( dot( vxyz, corners[hxyz & 7u] ),dot( vxyz, corners[(hxyz >> 3) & 7u] ) );
 
-    vec3 ratio;
-
-    //ratio.xy = vec2(fract(p.x),fract(p.y));
-
-    ratio.xyz = vec3(my_smoothstep(fract(p.x)),my_smoothstep(fract(p.y)),my_smoothstep(fract(p.z)));
+    vec3 ratio = my_smoothstep(v);
 
     vec2 val = mix(
         mix(
@@ -239,17 +264,18 @@ vec3 perlin_noise_3d(vec2 p){
     uint hx  = pcg_hash(p3x)  ;
     uint hy  = pcg_hash(p3y)  ;
     uint hxy = pcg_hash(p3xy) ;
+
+    vec2 v   = p - p3;
+    vec2 vx  = p - p3x;
+    vec2 vy  = p - p3y;
+    vec2 vxy = p - p3xy;
     
-    vec3 c    = vec3( dot(p - p3  , corners[h   & 3u] ), dot(p - p3  , corners[(h  >> 2) & 3u] ), dot(p - p3  , corners[(h  >> 4) & 3u] ) );
-    vec3 cx   = vec3( dot(p - p3x , corners[hx  & 3u] ), dot(p - p3x , corners[(hx >> 2) & 3u] ), dot(p - p3x , corners[(hx >> 4) & 3u] ) );
-    vec3 cy   = vec3( dot(p - p3y , corners[hy  & 3u] ), dot(p - p3y , corners[(hy >> 2) & 3u] ), dot(p - p3y , corners[(hy >> 4) & 3u] ) );
-    vec3 cxy  = vec3( dot(p - p3xy, corners[hxy & 3u] ), dot(p - p3xy, corners[(hxy>> 2) & 3u] ), dot(p - p3xy, corners[(hxy>> 4) & 3u] ) );
+    vec3 c    = vec3( dot( v  , corners[h   & 3u] ), dot( v  , corners[(h  >> 2) & 3u] ), dot( v  , corners[(h  >> 4) & 3u] ) );
+    vec3 cx   = vec3( dot( vx , corners[hx  & 3u] ), dot( vx , corners[(hx >> 2) & 3u] ), dot( vx , corners[(hx >> 4) & 3u] ) );
+    vec3 cy   = vec3( dot( vy , corners[hy  & 3u] ), dot( vy , corners[(hy >> 2) & 3u] ), dot( vy , corners[(hy >> 4) & 3u] ) );
+    vec3 cxy  = vec3( dot( vxy, corners[hxy & 3u] ), dot( vxy, corners[(hxy>> 2) & 3u] ), dot( vxy, corners[(hxy>> 4) & 3u] ) );
 
-    vec2 ratio;
-
-    //ratio.xy = vec2(fract(p.x),fract(p.y));
-
-    ratio.xy = vec2(my_smoothstep(fract(p.x)),my_smoothstep(fract(p.y)));
+    vec2 ratio = my_smoothstep(v);
 
     vec3 val = mix(mix(c,cx,ratio.x),mix(cy,cxy,ratio.x),ratio.y);
 
@@ -282,21 +308,26 @@ vec3 perlin_noise_3d(vec3 p){
     uint hxz  = pcg_hash(p3xz) ;
     uint hyz  = pcg_hash(p3yz) ;
     uint hxyz = pcg_hash(p3xyz);
+
+    vec3 v    = p - p3   ;
+    vec3 vx   = p - p3x  ;
+    vec3 vy   = p - p3y  ;
+    vec3 vxy  = p - p3xy ;
+    vec3 vz   = p - p3z  ;
+    vec3 vxz  = p - p3xz ;
+    vec3 vyz  = p - p3yz ;
+    vec3 vxyz = p - p3xyz;
     
-    vec3 c    = vec3( dot(p - p3  ,  corners[h    & 7u] ),dot(p - p3  ,  corners[(h    >> 3) & 7u] ),dot(p - p3  ,  corners[(h    >> 6) & 7u] ) );
-    vec3 cx   = vec3( dot(p - p3x ,  corners[hx   & 7u] ),dot(p - p3x ,  corners[(hx   >> 3) & 7u] ),dot(p - p3x ,  corners[(hx   >> 6) & 7u] ) );
-    vec3 cy   = vec3( dot(p - p3y ,  corners[hy   & 7u] ),dot(p - p3y ,  corners[(hy   >> 3) & 7u] ),dot(p - p3y ,  corners[(hy   >> 6) & 7u] ) );
-    vec3 cxy  = vec3( dot(p - p3xy,  corners[hxy  & 7u] ),dot(p - p3xy,  corners[(hxy  >> 3) & 7u] ),dot(p - p3xy,  corners[(hxy  >> 6) & 7u] ) );
-    vec3 cz   = vec3( dot(p - p3z  , corners[hz   & 7u] ),dot(p - p3z  , corners[(hz   >> 3) & 7u] ),dot(p - p3z  , corners[(hz   >> 6) & 7u] ) );
-    vec3 cxz  = vec3( dot(p - p3xz , corners[hxz  & 7u] ),dot(p - p3xz , corners[(hxz  >> 3) & 7u] ),dot(p - p3xz , corners[(hxz  >> 6) & 7u] ) );
-    vec3 cyz  = vec3( dot(p - p3yz , corners[hyz  & 7u] ),dot(p - p3yz , corners[(hyz  >> 3) & 7u] ),dot(p - p3yz , corners[(hyz  >> 6) & 7u] ) );
-    vec3 cxyz = vec3( dot(p - p3xyz, corners[hxyz & 7u] ),dot(p - p3xyz, corners[(hxyz >> 3) & 7u] ),dot(p - p3xyz, corners[(hxyz >> 6) & 7u] ) );
+    vec3 c    = vec3( dot( v  ,  corners[h    & 7u] ),dot( v  ,  corners[(h    >> 3) & 7u] ),dot( v  ,  corners[(h    >> 6) & 7u] ) );
+    vec3 cx   = vec3( dot( vx ,  corners[hx   & 7u] ),dot( vx ,  corners[(hx   >> 3) & 7u] ),dot( vx ,  corners[(hx   >> 6) & 7u] ) );
+    vec3 cy   = vec3( dot( vy ,  corners[hy   & 7u] ),dot( vy ,  corners[(hy   >> 3) & 7u] ),dot( vy ,  corners[(hy   >> 6) & 7u] ) );
+    vec3 cxy  = vec3( dot( vxy,  corners[hxy  & 7u] ),dot( vxy,  corners[(hxy  >> 3) & 7u] ),dot( vxy,  corners[(hxy  >> 6) & 7u] ) );
+    vec3 cz   = vec3( dot( vz  , corners[hz   & 7u] ),dot( vz  , corners[(hz   >> 3) & 7u] ),dot( vz  , corners[(hz   >> 6) & 7u] ) );
+    vec3 cxz  = vec3( dot( vxz , corners[hxz  & 7u] ),dot( vxz , corners[(hxz  >> 3) & 7u] ),dot( vxz , corners[(hxz  >> 6) & 7u] ) );
+    vec3 cyz  = vec3( dot( vyz , corners[hyz  & 7u] ),dot( vyz , corners[(hyz  >> 3) & 7u] ),dot( vyz , corners[(hyz  >> 6) & 7u] ) );
+    vec3 cxyz = vec3( dot( vxyz, corners[hxyz & 7u] ),dot( vxyz, corners[(hxyz >> 3) & 7u] ),dot( vxyz, corners[(hxyz >> 6) & 7u] ) );
 
-    vec3 ratio;
-
-    //ratio.xy = vec2(fract(p.x),fract(p.y));
-
-    ratio.xyz = vec3(my_smoothstep(fract(p.x)),my_smoothstep(fract(p.y)),my_smoothstep(fract(p.z)));
+    vec3 ratio = my_smoothstep(v);
 
     vec3 val = mix(
         mix(
@@ -314,6 +345,8 @@ vec3 perlin_noise_3d(vec3 p){
 
 #ifdef PERLIN_TIME
 
+const float DaySec = 1200.0;
+
 float loop(float value,float loop_length){
     return fract(value / loop_length) * loop_length;
 }
@@ -327,7 +360,7 @@ float perlin_noise_t(vec2 p,float freqency,float phase){
         vec3( 1,-1,-1),vec3(-1,-1,-1)
     );
 
-    float daylength = 1200.0 * freqency;
+    float daylength = DaySec * freqency;
 
     vec3 p2 = vec3(p.xy,GameTime * daylength + phase);
 
@@ -349,20 +382,25 @@ float perlin_noise_t(vec2 p,float freqency,float phase){
     uint hyz  = pcg_hash(vec3( p3yz.xy,  loop( p3yz.z  , daylength ) ) );
     uint hxyz = pcg_hash(vec3( p3xyz.xy, loop( p3xyz.z , daylength ) ) );
     
-    float c    = dot(p2 - p3   , corners[h    & 7u] );
-    float cx   = dot(p2 - p3x  , corners[hx   & 7u] );
-    float cy   = dot(p2 - p3y  , corners[hy   & 7u] );
-    float cxy  = dot(p2 - p3xy , corners[hxy  & 7u] );
-    float cz   = dot(p2 - p3z  , corners[hz   & 7u] );
-    float cxz  = dot(p2 - p3xz , corners[hxz  & 7u] );
-    float cyz  = dot(p2 - p3yz , corners[hyz  & 7u] );
-    float cxyz = dot(p2 - p3xyz, corners[hxyz & 7u] );
+    vec3 v    = p2 - p3   ;
+    vec3 vx   = p2 - p3x  ;
+    vec3 vy   = p2 - p3y  ;
+    vec3 vxy  = p2 - p3xy ;
+    vec3 vz   = p2 - p3z  ;
+    vec3 vxz  = p2 - p3xz ;
+    vec3 vyz  = p2 - p3yz ;
+    vec3 vxyz = p2 - p3xyz;
 
-    vec3 ratio;
+    float c    = dot( v   , corners[h    & 7u] );
+    float cx   = dot( vx  , corners[hx   & 7u] );
+    float cy   = dot( vy  , corners[hy   & 7u] );
+    float cxy  = dot( vxy , corners[hxy  & 7u] );
+    float cz   = dot( vz  , corners[hz   & 7u] );
+    float cxz  = dot( vxz , corners[hxz  & 7u] );
+    float cyz  = dot( vyz , corners[hyz  & 7u] );
+    float cxyz = dot( vxyz, corners[hxyz & 7u] );
 
-    ratio.x = my_smoothstep(fract(p2.x));
-    ratio.y = my_smoothstep(fract(p2.y));
-    ratio.z = my_smoothstep(fract(p2.z));
+    vec3 ratio = my_smoothstep(v);
 
     float val = mix(
         mix(
@@ -391,7 +429,7 @@ float perlin_noise_t(vec3 p,float freqency,float phase){
         vec4( 1,-1,-1,-1),vec4(-1,-1,-1,-1)
     );
 
-    float daylength = 2400.0 * freqency;
+    float daylength = DaySec * freqency;
 
     vec4 p2 = vec4(p, GameTime * daylength + phase);
 
@@ -429,31 +467,41 @@ float perlin_noise_t(vec3 p,float freqency,float phase){
     uint hyzw  = pcg_hash(vec4( p3yzw.xyz,  loop( p3yzw.w  , daylength) ) );
     uint hxyzw = pcg_hash(vec4( p3xyzw.xyz, loop( p3xyzw.w , daylength) ) );
     
-    float c     = dot(p2 - p3     , corners[h     & 15u] );
-    float cx    = dot(p2 - p3x    , corners[hx    & 15u] );
-    float cy    = dot(p2 - p3y    , corners[hy    & 15u] );
-    float cxy   = dot(p2 - p3xy   , corners[hxy   & 15u] );
-    float cz    = dot(p2 - p3z    , corners[hz    & 15u] );
-    float cxz   = dot(p2 - p3xz   , corners[hxz   & 15u] );
-    float cyz   = dot(p2 - p3yz   , corners[hyz   & 15u] );
-    float cxyz  = dot(p2 - p3xyz  , corners[hxyz  & 15u] );
-    float cw    = dot(p2 - p3w    , corners[hw    & 15u] );
-    float cxw   = dot(p2 - p3xw   , corners[hxw   & 15u] );
-    float cyw   = dot(p2 - p3yw   , corners[hyw   & 15u] );
-    float cxyw  = dot(p2 - p3xyw  , corners[hxyw  & 15u] );
-    float czw   = dot(p2 - p3zw   , corners[hzw   & 15u] );
-    float cxzw  = dot(p2 - p3xzw  , corners[hxzw  & 15u] );
-    float cyzw  = dot(p2 - p3yzw  , corners[hyzw  & 15u] );
-    float cxyzw = dot(p2 - p3xyzw , corners[hxyzw & 15u] );
+    vec4 v     = p2 - p3    ;
+    vec4 vx    = p2 - p3x   ;
+    vec4 vy    = p2 - p3y   ;
+    vec4 vxy   = p2 - p3xy  ;
+    vec4 vz    = p2 - p3z   ;
+    vec4 vxz   = p2 - p3xz  ;
+    vec4 vyz   = p2 - p3yz  ;
+    vec4 vxyz  = p2 - p3xyz ;
+    vec4 vw    = p2 - p3w   ;
+    vec4 vxw   = p2 - p3xw  ;
+    vec4 vyw   = p2 - p3yw  ;
+    vec4 vxyw  = p2 - p3xyw ;
+    vec4 vzw   = p2 - p3zw  ;
+    vec4 vxzw  = p2 - p3xzw ;
+    vec4 vyzw  = p2 - p3yzw ;
+    vec4 vxyzw = p2 - p3xyzw;
 
-    vec4 ratio;
+    float c     = dot( v     , corners[h     & 15u] );
+    float cx    = dot( vx    , corners[hx    & 15u] );
+    float cy    = dot( vy    , corners[hy    & 15u] );
+    float cxy   = dot( vxy   , corners[hxy   & 15u] );
+    float cz    = dot( vz    , corners[hz    & 15u] );
+    float cxz   = dot( vxz   , corners[hxz   & 15u] );
+    float cyz   = dot( vyz   , corners[hyz   & 15u] );
+    float cxyz  = dot( vxyz  , corners[hxyz  & 15u] );
+    float cw    = dot( vw    , corners[hw    & 15u] );
+    float cxw   = dot( vxw   , corners[hxw   & 15u] );
+    float cyw   = dot( vyw   , corners[hyw   & 15u] );
+    float cxyw  = dot( vxyw  , corners[hxyw  & 15u] );
+    float czw   = dot( vzw   , corners[hzw   & 15u] );
+    float cxzw  = dot( vxzw  , corners[hxzw  & 15u] );
+    float cyzw  = dot( vyzw  , corners[hyzw  & 15u] );
+    float cxyzw = dot( vxyzw , corners[hxyzw & 15u] );
 
-    //ratio.xy = vec2(fract(p.x),fract(p.y));
-
-    ratio.x = my_smoothstep(fract(p2.x));
-    ratio.y = my_smoothstep(fract(p2.y));
-    ratio.z = my_smoothstep(fract(p2.z));
-    ratio.w = my_smoothstep(fract(p2.w));
+    vec4 ratio = my_smoothstep(v);
 
     float val = mix(
         mix(
@@ -490,7 +538,7 @@ vec2 perlin_noise_2d_t(vec2 p,float freqency,float phase){
         vec3( 1,-1,-1),vec3(-1,-1,-1)
     );
 
-    float daylength = 1200.0 * freqency;
+    float daylength = DaySec * freqency;
 
     vec3 p2 = vec3(p.xy,GameTime * daylength + phase);
 
@@ -511,21 +559,26 @@ vec2 perlin_noise_2d_t(vec2 p,float freqency,float phase){
     uint hxz  = pcg_hash(vec3( p3xz.xy,  loop( p3xz.z  , daylength ) ) );
     uint hyz  = pcg_hash(vec3( p3yz.xy,  loop( p3yz.z  , daylength ) ) );
     uint hxyz = pcg_hash(vec3( p3xyz.xy, loop( p3xyz.z , daylength ) ) );
-    
-    vec2 c    = vec2( dot(p2 - p3   , corners[h    & 7u] ), dot(p2 - p3   , corners[(h    >> 3 ) & 7u] ) );
-    vec2 cx   = vec2( dot(p2 - p3x  , corners[hx   & 7u] ), dot(p2 - p3x  , corners[(hx   >> 3 ) & 7u] ) );
-    vec2 cy   = vec2( dot(p2 - p3y  , corners[hy   & 7u] ), dot(p2 - p3y  , corners[(hy   >> 3 ) & 7u] ) );
-    vec2 cxy  = vec2( dot(p2 - p3xy , corners[hxy  & 7u] ), dot(p2 - p3xy , corners[(hxy  >> 3 ) & 7u] ) );
-    vec2 cz   = vec2( dot(p2 - p3z  , corners[hz   & 7u] ), dot(p2 - p3z  , corners[(hz   >> 3 ) & 7u] ) );
-    vec2 cxz  = vec2( dot(p2 - p3xz , corners[hxz  & 7u] ), dot(p2 - p3xz , corners[(hxz  >> 3 ) & 7u] ) );
-    vec2 cyz  = vec2( dot(p2 - p3yz , corners[hyz  & 7u] ), dot(p2 - p3yz , corners[(hyz  >> 3 ) & 7u] ) );
-    vec2 cxyz = vec2( dot(p2 - p3xyz, corners[hxyz & 7u] ), dot(p2 - p3xyz, corners[(hxyz >> 3 ) & 7u] ) );
 
-    vec3 ratio;
+    vec3 v    = p2 - p3   ;
+    vec3 vx   = p2 - p3x  ;
+    vec3 vy   = p2 - p3y  ;
+    vec3 vxy  = p2 - p3xy ;
+    vec3 vz   = p2 - p3z  ;
+    vec3 vxz  = p2 - p3xz ;
+    vec3 vyz  = p2 - p3yz ;
+    vec3 vxyz = p2 - p3xyz;
 
-    ratio.x = my_smoothstep(fract(p2.x));
-    ratio.y = my_smoothstep(fract(p2.y));
-    ratio.z = my_smoothstep(fract(p2.z));
+    vec2 c    = vec2( dot( v   , corners[h    & 7u] ), dot( v   , corners[(h    >> 3 ) & 7u] ) );
+    vec2 cx   = vec2( dot( vx  , corners[hx   & 7u] ), dot( vx  , corners[(hx   >> 3 ) & 7u] ) );
+    vec2 cy   = vec2( dot( vy  , corners[hy   & 7u] ), dot( vy  , corners[(hy   >> 3 ) & 7u] ) );
+    vec2 cxy  = vec2( dot( vxy , corners[hxy  & 7u] ), dot( vxy , corners[(hxy  >> 3 ) & 7u] ) );
+    vec2 cz   = vec2( dot( vz  , corners[hz   & 7u] ), dot( vz  , corners[(hz   >> 3 ) & 7u] ) );
+    vec2 cxz  = vec2( dot( vxz , corners[hxz  & 7u] ), dot( vxz , corners[(hxz  >> 3 ) & 7u] ) );
+    vec2 cyz  = vec2( dot( vyz , corners[hyz  & 7u] ), dot( vyz , corners[(hyz  >> 3 ) & 7u] ) );
+    vec2 cxyz = vec2( dot( vxyz, corners[hxyz & 7u] ), dot( vxyz, corners[(hxyz >> 3 ) & 7u] ) );
+
+    vec3 ratio = my_smoothstep(v);
 
     vec2 val = mix(
         mix(
@@ -554,7 +607,7 @@ vec2 perlin_noise_2d_t(vec3 p,float freqency,float phase){
         vec4( 1,-1,-1,-1),vec4(-1,-1,-1,-1)
     );
 
-    float daylength = 2400.0 * freqency;
+    float daylength = DaySec * freqency;
 
     vec4 p2 = vec4(p, GameTime * daylength + phase);
 
@@ -591,32 +644,42 @@ vec2 perlin_noise_2d_t(vec3 p,float freqency,float phase){
     uint hxzw  = pcg_hash(vec4( p3xzw.xyz,  loop( p3xzw.w  , daylength) ));
     uint hyzw  = pcg_hash(vec4( p3yzw.xyz,  loop( p3yzw.w  , daylength) ));
     uint hxyzw = pcg_hash(vec4( p3xyzw.xyz, loop( p3xyzw.w , daylength) ));
+
+    vec4 v     = p2 - p3    ;
+    vec4 vx    = p2 - p3x   ;
+    vec4 vy    = p2 - p3y   ;
+    vec4 vxy   = p2 - p3xy  ;
+    vec4 vz    = p2 - p3z   ;
+    vec4 vxz   = p2 - p3xz  ;
+    vec4 vyz   = p2 - p3yz  ;
+    vec4 vxyz  = p2 - p3xyz ;
+    vec4 vw    = p2 - p3w   ;
+    vec4 vxw   = p2 - p3xw  ;
+    vec4 vyw   = p2 - p3yw  ;
+    vec4 vxyw  = p2 - p3xyw ;
+    vec4 vzw   = p2 - p3zw  ;
+    vec4 vxzw  = p2 - p3xzw ;
+    vec4 vyzw  = p2 - p3yzw ;
+    vec4 vxyzw = p2 - p3xyzw;
     
-    vec2 c     = vec2( dot(p2 - p3     , corners[h     & 15u] ), dot(p2 - p3     , corners[(h     >> 4) & 15u] ) );
-    vec2 cx    = vec2( dot(p2 - p3x    , corners[hx    & 15u] ), dot(p2 - p3x    , corners[(hx    >> 4) & 15u] ) );
-    vec2 cy    = vec2( dot(p2 - p3y    , corners[hy    & 15u] ), dot(p2 - p3y    , corners[(hy    >> 4) & 15u] ) );
-    vec2 cxy   = vec2( dot(p2 - p3xy   , corners[hxy   & 15u] ), dot(p2 - p3xy   , corners[(hxy   >> 4) & 15u] ) );
-    vec2 cz    = vec2( dot(p2 - p3z    , corners[hz    & 15u] ), dot(p2 - p3z    , corners[(hz    >> 4) & 15u] ) );
-    vec2 cxz   = vec2( dot(p2 - p3xz   , corners[hxz   & 15u] ), dot(p2 - p3xz   , corners[(hxz   >> 4) & 15u] ) );
-    vec2 cyz   = vec2( dot(p2 - p3yz   , corners[hyz   & 15u] ), dot(p2 - p3yz   , corners[(hyz   >> 4) & 15u] ) );
-    vec2 cxyz  = vec2( dot(p2 - p3xyz  , corners[hxyz  & 15u] ), dot(p2 - p3xyz  , corners[(hxyz  >> 4) & 15u] ) );
-    vec2 cw    = vec2( dot(p2 - p3w    , corners[hw    & 15u] ), dot(p2 - p3w    , corners[(hw    >> 4) & 15u] ) );
-    vec2 cxw   = vec2( dot(p2 - p3xw   , corners[hxw   & 15u] ), dot(p2 - p3xw   , corners[(hxw   >> 4) & 15u] ) );
-    vec2 cyw   = vec2( dot(p2 - p3yw   , corners[hyw   & 15u] ), dot(p2 - p3yw   , corners[(hyw   >> 4) & 15u] ) );
-    vec2 cxyw  = vec2( dot(p2 - p3xyw  , corners[hxyw  & 15u] ), dot(p2 - p3xyw  , corners[(hxyw  >> 4) & 15u] ) );
-    vec2 czw   = vec2( dot(p2 - p3zw   , corners[hzw   & 15u] ), dot(p2 - p3zw   , corners[(hzw   >> 4) & 15u] ) );
-    vec2 cxzw  = vec2( dot(p2 - p3xzw  , corners[hxzw  & 15u] ), dot(p2 - p3xzw  , corners[(hxzw  >> 4) & 15u] ) );
-    vec2 cyzw  = vec2( dot(p2 - p3yzw  , corners[hyzw  & 15u] ), dot(p2 - p3yzw  , corners[(hyzw  >> 4) & 15u] ) );
-    vec2 cxyzw = vec2( dot(p2 - p3xyzw , corners[hxyzw & 15u] ), dot(p2 - p3xyzw , corners[(hxyzw >> 4) & 15u] ) );
+    vec2 c     = vec2( dot( v     , corners[h     & 15u] ), dot( v     , corners[(h     >> 4) & 15u] ) );
+    vec2 cx    = vec2( dot( vx    , corners[hx    & 15u] ), dot( vx    , corners[(hx    >> 4) & 15u] ) );
+    vec2 cy    = vec2( dot( vy    , corners[hy    & 15u] ), dot( vy    , corners[(hy    >> 4) & 15u] ) );
+    vec2 cxy   = vec2( dot( vxy   , corners[hxy   & 15u] ), dot( vxy   , corners[(hxy   >> 4) & 15u] ) );
+    vec2 cz    = vec2( dot( vz    , corners[hz    & 15u] ), dot( vz    , corners[(hz    >> 4) & 15u] ) );
+    vec2 cxz   = vec2( dot( vxz   , corners[hxz   & 15u] ), dot( vxz   , corners[(hxz   >> 4) & 15u] ) );
+    vec2 cyz   = vec2( dot( vyz   , corners[hyz   & 15u] ), dot( vyz   , corners[(hyz   >> 4) & 15u] ) );
+    vec2 cxyz  = vec2( dot( vxyz  , corners[hxyz  & 15u] ), dot( vxyz  , corners[(hxyz  >> 4) & 15u] ) );
+    vec2 cw    = vec2( dot( vw    , corners[hw    & 15u] ), dot( vw    , corners[(hw    >> 4) & 15u] ) );
+    vec2 cxw   = vec2( dot( vxw   , corners[hxw   & 15u] ), dot( vxw   , corners[(hxw   >> 4) & 15u] ) );
+    vec2 cyw   = vec2( dot( vyw   , corners[hyw   & 15u] ), dot( vyw   , corners[(hyw   >> 4) & 15u] ) );
+    vec2 cxyw  = vec2( dot( vxyw  , corners[hxyw  & 15u] ), dot( vxyw  , corners[(hxyw  >> 4) & 15u] ) );
+    vec2 czw   = vec2( dot( vzw   , corners[hzw   & 15u] ), dot( vzw   , corners[(hzw   >> 4) & 15u] ) );
+    vec2 cxzw  = vec2( dot( vxzw  , corners[hxzw  & 15u] ), dot( vxzw  , corners[(hxzw  >> 4) & 15u] ) );
+    vec2 cyzw  = vec2( dot( vyzw  , corners[hyzw  & 15u] ), dot( vyzw  , corners[(hyzw  >> 4) & 15u] ) );
+    vec2 cxyzw = vec2( dot( vxyzw , corners[hxyzw & 15u] ), dot( vxyzw , corners[(hxyzw >> 4) & 15u] ) );
 
-    vec4 ratio;
-
-    //ratio.xy = vec2(fract(p.x),fract(p.y));
-
-    ratio.x = my_smoothstep(fract(p2.x));
-    ratio.y = my_smoothstep(fract(p2.y));
-    ratio.z = my_smoothstep(fract(p2.z));
-    ratio.w = my_smoothstep(fract(p2.w));
+    vec4 ratio = my_smoothstep(v);
 
     vec2 val = mix(
         mix(
@@ -653,7 +716,7 @@ vec3 perlin_noise_3d_t(vec2 p,float freqency,float phase){
         vec3( 1,-1,-1),vec3(-1,-1,-1)
     );
 
-    float daylength = 1200.0 * freqency;
+    float daylength = DaySec * freqency;
 
     vec3 p2 = vec3(p.xy,GameTime * daylength + phase);
 
@@ -675,20 +738,25 @@ vec3 perlin_noise_3d_t(vec2 p,float freqency,float phase){
     uint hyz  = pcg_hash(vec3( p3yz.xy,  loop( p3yz.z  , daylength ) ) );
     uint hxyz = pcg_hash(vec3( p3xyz.xy, loop( p3xyz.z , daylength ) ) );
     
-    vec3 c    = vec3( dot(p2 - p3   , corners[h    & 7u] ), dot(p2 - p3   , corners[(h    >> 3 ) & 7u] ), dot(p2 - p3   , corners[(h    >> 6 ) & 7u] ) );
-    vec3 cx   = vec3( dot(p2 - p3x  , corners[hx   & 7u] ), dot(p2 - p3x  , corners[(hx   >> 3 ) & 7u] ), dot(p2 - p3x  , corners[(hx   >> 6 ) & 7u] ) );
-    vec3 cy   = vec3( dot(p2 - p3y  , corners[hy   & 7u] ), dot(p2 - p3y  , corners[(hy   >> 3 ) & 7u] ), dot(p2 - p3y  , corners[(hy   >> 6 ) & 7u] ) );
-    vec3 cxy  = vec3( dot(p2 - p3xy , corners[hxy  & 7u] ), dot(p2 - p3xy , corners[(hxy  >> 3 ) & 7u] ), dot(p2 - p3xy , corners[(hxy  >> 6 ) & 7u] ) );
-    vec3 cz   = vec3( dot(p2 - p3z  , corners[hz   & 7u] ), dot(p2 - p3z  , corners[(hz   >> 3 ) & 7u] ), dot(p2 - p3z  , corners[(hz   >> 6 ) & 7u] ) );
-    vec3 cxz  = vec3( dot(p2 - p3xz , corners[hxz  & 7u] ), dot(p2 - p3xz , corners[(hxz  >> 3 ) & 7u] ), dot(p2 - p3xz , corners[(hxz  >> 6 ) & 7u] ) );
-    vec3 cyz  = vec3( dot(p2 - p3yz , corners[hyz  & 7u] ), dot(p2 - p3yz , corners[(hyz  >> 3 ) & 7u] ), dot(p2 - p3yz , corners[(hyz  >> 6 ) & 7u] ) );
-    vec3 cxyz = vec3( dot(p2 - p3xyz, corners[hxyz & 7u] ), dot(p2 - p3xyz, corners[(hxyz >> 3 ) & 7u] ), dot(p2 - p3xyz, corners[(hxyz >> 6 ) & 7u] ) );
+    vec3 v    = p2 - p3   ;
+    vec3 vx   = p2 - p3x  ;
+    vec3 vy   = p2 - p3y  ;
+    vec3 vxy  = p2 - p3xy ;
+    vec3 vz   = p2 - p3z  ;
+    vec3 vxz  = p2 - p3xz ;
+    vec3 vyz  = p2 - p3yz ;
+    vec3 vxyz = p2 - p3xyz;
 
-    vec3 ratio;
+    vec3 c    = vec3( dot( v   , corners[h    & 7u] ), dot( v   , corners[(h    >> 3 ) & 7u] ), dot( v   , corners[(h    >> 6 ) & 7u] ) );
+    vec3 cx   = vec3( dot( vx  , corners[hx   & 7u] ), dot( vx  , corners[(hx   >> 3 ) & 7u] ), dot( vx  , corners[(hx   >> 6 ) & 7u] ) );
+    vec3 cy   = vec3( dot( vy  , corners[hy   & 7u] ), dot( vy  , corners[(hy   >> 3 ) & 7u] ), dot( vy  , corners[(hy   >> 6 ) & 7u] ) );
+    vec3 cxy  = vec3( dot( vxy , corners[hxy  & 7u] ), dot( vxy , corners[(hxy  >> 3 ) & 7u] ), dot( vxy , corners[(hxy  >> 6 ) & 7u] ) );
+    vec3 cz   = vec3( dot( vz  , corners[hz   & 7u] ), dot( vz  , corners[(hz   >> 3 ) & 7u] ), dot( vz  , corners[(hz   >> 6 ) & 7u] ) );
+    vec3 cxz  = vec3( dot( vxz , corners[hxz  & 7u] ), dot( vxz , corners[(hxz  >> 3 ) & 7u] ), dot( vxz , corners[(hxz  >> 6 ) & 7u] ) );
+    vec3 cyz  = vec3( dot( vyz , corners[hyz  & 7u] ), dot( vyz , corners[(hyz  >> 3 ) & 7u] ), dot( vyz , corners[(hyz  >> 6 ) & 7u] ) );
+    vec3 cxyz = vec3( dot( vxyz, corners[hxyz & 7u] ), dot( vxyz, corners[(hxyz >> 3 ) & 7u] ), dot( vxyz, corners[(hxyz >> 6 ) & 7u] ) );
 
-    ratio.x = my_smoothstep(fract(p2.x));
-    ratio.y = my_smoothstep(fract(p2.y));
-    ratio.z = my_smoothstep(fract(p2.z));
+    vec3 ratio = my_smoothstep(v);
 
     vec3 val = mix(
         mix(
@@ -717,7 +785,7 @@ vec3 perlin_noise_3d_t(vec3 p,float freqency,float phase){
         vec4( 1,-1,-1,-1),vec4(-1,-1,-1,-1)
     );
 
-    float daylength = 2400.0 * freqency;
+    float daylength = DaySec * freqency;
 
     vec4 p2 = vec4(p, GameTime * daylength + phase);
 
@@ -754,32 +822,42 @@ vec3 perlin_noise_3d_t(vec3 p,float freqency,float phase){
     uint hxzw  = pcg_hash(vec4( p3xzw.xyz,  loop( p3xzw.w  , daylength) ));
     uint hyzw  = pcg_hash(vec4( p3yzw.xyz,  loop( p3yzw.w  , daylength) ));
     uint hxyzw = pcg_hash(vec4( p3xyzw.xyz, loop( p3xyzw.w , daylength) ));
+
+    vec4 v     = p2 - p3    ;
+    vec4 vx    = p2 - p3x   ;
+    vec4 vy    = p2 - p3y   ;
+    vec4 vxy   = p2 - p3xy  ;
+    vec4 vz    = p2 - p3z   ;
+    vec4 vxz   = p2 - p3xz  ;
+    vec4 vyz   = p2 - p3yz  ;
+    vec4 vxyz  = p2 - p3xyz ;
+    vec4 vw    = p2 - p3w   ;
+    vec4 vxw   = p2 - p3xw  ;
+    vec4 vyw   = p2 - p3yw  ;
+    vec4 vxyw  = p2 - p3xyw ;
+    vec4 vzw   = p2 - p3zw  ;
+    vec4 vxzw  = p2 - p3xzw ;
+    vec4 vyzw  = p2 - p3yzw ;
+    vec4 vxyzw = p2 - p3xyzw;
     
-    vec3 c     = vec3( dot(p2 - p3     , corners[h     & 15u] ), dot(p2 - p3     , corners[(h     >> 4) & 15u] ), dot(p2 - p3     , corners[(h     >> 8) & 15u] ) );
-    vec3 cx    = vec3( dot(p2 - p3x    , corners[hx    & 15u] ), dot(p2 - p3x    , corners[(hx    >> 4) & 15u] ), dot(p2 - p3x    , corners[(hx    >> 8) & 15u] ) );
-    vec3 cy    = vec3( dot(p2 - p3y    , corners[hy    & 15u] ), dot(p2 - p3y    , corners[(hy    >> 4) & 15u] ), dot(p2 - p3y    , corners[(hy    >> 8) & 15u] ) );
-    vec3 cxy   = vec3( dot(p2 - p3xy   , corners[hxy   & 15u] ), dot(p2 - p3xy   , corners[(hxy   >> 4) & 15u] ), dot(p2 - p3xy   , corners[(hxy   >> 8) & 15u] ) );
-    vec3 cz    = vec3( dot(p2 - p3z    , corners[hz    & 15u] ), dot(p2 - p3z    , corners[(hz    >> 4) & 15u] ), dot(p2 - p3z    , corners[(hz    >> 8) & 15u] ) );
-    vec3 cxz   = vec3( dot(p2 - p3xz   , corners[hxz   & 15u] ), dot(p2 - p3xz   , corners[(hxz   >> 4) & 15u] ), dot(p2 - p3xz   , corners[(hxz   >> 8) & 15u] ) );
-    vec3 cyz   = vec3( dot(p2 - p3yz   , corners[hyz   & 15u] ), dot(p2 - p3yz   , corners[(hyz   >> 4) & 15u] ), dot(p2 - p3yz   , corners[(hyz   >> 8) & 15u] ) );
-    vec3 cxyz  = vec3( dot(p2 - p3xyz  , corners[hxyz  & 15u] ), dot(p2 - p3xyz  , corners[(hxyz  >> 4) & 15u] ), dot(p2 - p3xyz  , corners[(hxyz  >> 8) & 15u] ) );
-    vec3 cw    = vec3( dot(p2 - p3w    , corners[hw    & 15u] ), dot(p2 - p3w    , corners[(hw    >> 4) & 15u] ), dot(p2 - p3w    , corners[(hw    >> 8) & 15u] ) );
-    vec3 cxw   = vec3( dot(p2 - p3xw   , corners[hxw   & 15u] ), dot(p2 - p3xw   , corners[(hxw   >> 4) & 15u] ), dot(p2 - p3xw   , corners[(hxw   >> 8) & 15u] ) );
-    vec3 cyw   = vec3( dot(p2 - p3yw   , corners[hyw   & 15u] ), dot(p2 - p3yw   , corners[(hyw   >> 4) & 15u] ), dot(p2 - p3yw   , corners[(hyw   >> 8) & 15u] ) );
-    vec3 cxyw  = vec3( dot(p2 - p3xyw  , corners[hxyw  & 15u] ), dot(p2 - p3xyw  , corners[(hxyw  >> 4) & 15u] ), dot(p2 - p3xyw  , corners[(hxyw  >> 8) & 15u] ) );
-    vec3 czw   = vec3( dot(p2 - p3zw   , corners[hzw   & 15u] ), dot(p2 - p3zw   , corners[(hzw   >> 4) & 15u] ), dot(p2 - p3zw   , corners[(hzw   >> 8) & 15u] ) );
-    vec3 cxzw  = vec3( dot(p2 - p3xzw  , corners[hxzw  & 15u] ), dot(p2 - p3xzw  , corners[(hxzw  >> 4) & 15u] ), dot(p2 - p3xzw  , corners[(hxzw  >> 8) & 15u] ) );
-    vec3 cyzw  = vec3( dot(p2 - p3yzw  , corners[hyzw  & 15u] ), dot(p2 - p3yzw  , corners[(hyzw  >> 4) & 15u] ), dot(p2 - p3yzw  , corners[(hyzw  >> 8) & 15u] ) );
-    vec3 cxyzw = vec3( dot(p2 - p3xyzw , corners[hxyzw & 15u] ), dot(p2 - p3xyzw , corners[(hxyzw >> 4) & 15u] ), dot(p2 - p3xyzw , corners[(hxyzw >> 8) & 15u] ) );
+    vec3 c     = vec3( dot( v     , corners[h     & 15u] ), dot( v     , corners[(h     >> 4) & 15u] ), dot( v     , corners[(h     >> 8) & 15u] ) );
+    vec3 cx    = vec3( dot( vx    , corners[hx    & 15u] ), dot( vx    , corners[(hx    >> 4) & 15u] ), dot( vx    , corners[(hx    >> 8) & 15u] ) );
+    vec3 cy    = vec3( dot( vy    , corners[hy    & 15u] ), dot( vy    , corners[(hy    >> 4) & 15u] ), dot( vy    , corners[(hy    >> 8) & 15u] ) );
+    vec3 cxy   = vec3( dot( vxy   , corners[hxy   & 15u] ), dot( vxy   , corners[(hxy   >> 4) & 15u] ), dot( vxy   , corners[(hxy   >> 8) & 15u] ) );
+    vec3 cz    = vec3( dot( vz    , corners[hz    & 15u] ), dot( vz    , corners[(hz    >> 4) & 15u] ), dot( vz    , corners[(hz    >> 8) & 15u] ) );
+    vec3 cxz   = vec3( dot( vxz   , corners[hxz   & 15u] ), dot( vxz   , corners[(hxz   >> 4) & 15u] ), dot( vxz   , corners[(hxz   >> 8) & 15u] ) );
+    vec3 cyz   = vec3( dot( vyz   , corners[hyz   & 15u] ), dot( vyz   , corners[(hyz   >> 4) & 15u] ), dot( vyz   , corners[(hyz   >> 8) & 15u] ) );
+    vec3 cxyz  = vec3( dot( vxyz  , corners[hxyz  & 15u] ), dot( vxyz  , corners[(hxyz  >> 4) & 15u] ), dot( vxyz  , corners[(hxyz  >> 8) & 15u] ) );
+    vec3 cw    = vec3( dot( vw    , corners[hw    & 15u] ), dot( vw    , corners[(hw    >> 4) & 15u] ), dot( vw    , corners[(hw    >> 8) & 15u] ) );
+    vec3 cxw   = vec3( dot( vxw   , corners[hxw   & 15u] ), dot( vxw   , corners[(hxw   >> 4) & 15u] ), dot( vxw   , corners[(hxw   >> 8) & 15u] ) );
+    vec3 cyw   = vec3( dot( vyw   , corners[hyw   & 15u] ), dot( vyw   , corners[(hyw   >> 4) & 15u] ), dot( vyw   , corners[(hyw   >> 8) & 15u] ) );
+    vec3 cxyw  = vec3( dot( vxyw  , corners[hxyw  & 15u] ), dot( vxyw  , corners[(hxyw  >> 4) & 15u] ), dot( vxyw  , corners[(hxyw  >> 8) & 15u] ) );
+    vec3 czw   = vec3( dot( vzw   , corners[hzw   & 15u] ), dot( vzw   , corners[(hzw   >> 4) & 15u] ), dot( vzw   , corners[(hzw   >> 8) & 15u] ) );
+    vec3 cxzw  = vec3( dot( vxzw  , corners[hxzw  & 15u] ), dot( vxzw  , corners[(hxzw  >> 4) & 15u] ), dot( vxzw  , corners[(hxzw  >> 8) & 15u] ) );
+    vec3 cyzw  = vec3( dot( vyzw  , corners[hyzw  & 15u] ), dot( vyzw  , corners[(hyzw  >> 4) & 15u] ), dot( vyzw  , corners[(hyzw  >> 8) & 15u] ) );
+    vec3 cxyzw = vec3( dot( vxyzw , corners[hxyzw & 15u] ), dot( vxyzw , corners[(hxyzw >> 4) & 15u] ), dot( vxyzw , corners[(hxyzw >> 8) & 15u] ) );
 
-    vec4 ratio;
-
-    //ratio.xy = vec2(fract(p.x),fract(p.y));
-
-    ratio.x = my_smoothstep(fract(p2.x));
-    ratio.y = my_smoothstep(fract(p2.y));
-    ratio.z = my_smoothstep(fract(p2.z));
-    ratio.w = my_smoothstep(fract(p2.w));
+    vec4 ratio = my_smoothstep(v);
 
     vec3 val = mix(
         mix(
