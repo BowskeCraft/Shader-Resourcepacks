@@ -29,10 +29,12 @@ void main() {
     float amplitude = Color.b > Color.r ? 0.1 : 0.0;
 
     if(amplitude > 0){
-        vec3 noise;
-        noise.x = perlin_noise_t(pos.yz * 0.25, 0.2, 0.0) + 0.5 * perlin_noise_t( pos.yz * 0.5, 0.4, 0.1);
-        noise.y = perlin_noise_t(pos.xz * 0.25, 0.2, 4.3) + 0.5 * perlin_noise_t( pos.xz * 0.5, 0.4, 4.4);
-        noise.z = perlin_noise_t(pos.xy * 0.25, 0.2, 8.6) + 0.5 * perlin_noise_t( pos.xy * 0.5, 0.4, 8.8);
+        vec3 noise = vec3(0.0);
+        //noise.x = perlin_noise_t(pos.yz * 0.25, 0.2, 0.0) + 0.5 * perlin_noise_t( pos.yz * 0.5, 0.4, 0.1);
+        //noise.y = perlin_noise_t(pos.xz * 0.25, 0.2, 4.3) + 0.5 * perlin_noise_t( pos.xz * 0.5, 0.4, 4.4);
+        //noise.z = perlin_noise_t(pos.xy * 0.25, 0.2, 8.6) + 0.5 * perlin_noise_t( pos.xy * 0.5, 0.4, 8.8);
+
+        noise = perlin_noise_3d_t(pos * 0.25, 0.2, 8.6) + 0.5 * perlin_noise_3d_t( pos * 0.5, 0.4, 8.8);
         pos += noise * amplitude;
     }
     pos += CameraOffset - CameraBlockPos;
