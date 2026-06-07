@@ -24,9 +24,13 @@ uint pcg_hash(vec4 v){
 }
 
 float my_smoothstep(float x){
-    //return x * x * x * (x * (x * 6. - 15.) + 10.);
+#ifdef NOISE_DIFFERENTIABLE
+    return x * x * x * (x * (x * 6.0 - 15.0) + 10.0);
+#else
     return x * x * (3.0 - x* 2.0);
+#endif
 }
+
 vec2 my_smoothstep(vec2 x){
     //return x * x * x * (x * (x * 6. - 15.) + 10.);
     return vec2(my_smoothstep(x.x),my_smoothstep(x.y));
@@ -46,17 +50,13 @@ float perlin_noise(vec2 p){
         vec2( 1, 1),
         vec2(-1, 1),
         vec2( 1,-1),
-        vec2(-1,-1),
-        vec2(1,0),
-        vec2(-1,0),
-        vec2(0.,1),
-        vec2(0.,-1)
+        vec2(-1,-1)
     );
 
-    vec2 p3   = vec2(floor(p.x) ,floor(p.y)  );
-    vec2 p3x  = vec2(p3.x + 1.0, p3.y      );
-    vec2 p3y  = vec2(p3.x      , p3.y + 1.0);
-    vec2 p3xy = vec2(p3.x + 1.0, p3.y + 1.0);
+    vec2 p3   = vec2(floor(p.x) ,floor(p.y) );
+    vec2 p3x  = vec2(p3.x + 1.0, p3.y       );
+    vec2 p3y  = vec2(p3.x      , p3.y + 1.0 );
+    vec2 p3xy = vec2(p3.x + 1.0, p3.y + 1.0 );
 
     uint h   = pcg_hash(p3)   ;
     uint hx  = pcg_hash(p3x)  ;
@@ -89,14 +89,14 @@ float perlin_noise(vec3 p){
         vec3( 1,-1,-1),vec3(-1,-1,-1)
     );
 
-    vec3 p3    = vec3(floor(p.x) ,floor(p.y) ,floor(p.z) );
-    vec3 p3x   = vec3(p3.x + 1.0, p3.y      , p3.z );
-    vec3 p3y   = vec3(p3.x      , p3.y + 1.0, p3.z );
-    vec3 p3xy  = vec3(p3.x + 1.0, p3.y + 1.0, p3.z );
-    vec3 p3z   = vec3(p3.x      , p3.y      , p3.z + 1.0 ); 
-    vec3 p3xz  = vec3(p3.x + 1.0, p3.y      , p3.z + 1.0 );
-    vec3 p3yz  = vec3(p3.x      , p3.y + 1.0, p3.z + 1.0 );
-    vec3 p3xyz = vec3(p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3     = floor(p);//vec3(floor(p2.x) ,floor(p2.y) ,floor(p2.z));
+    vec3 p3xyz  = p3 + 1.0; //vec3( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3x    = vec3( p3xyz.x , p3.y    , p3.z    );
+    vec3 p3y    = vec3( p3.x    , p3xyz.y , p3.z    );
+    vec3 p3xy   = vec3( p3xyz.x , p3xyz.y , p3.z    );
+    vec3 p3z    = vec3( p3.x    , p3.y    , p3xyz.z ); 
+    vec3 p3xz   = vec3( p3xyz.x , p3.y    , p3xyz.z );
+    vec3 p3yz   = vec3( p3.x    , p3xyz.y , p3xyz.z );
 
     uint h    = pcg_hash(p3)   ;
     uint hx   = pcg_hash(p3x)  ;
@@ -146,11 +146,7 @@ vec2 perlin_noise_2d(vec2 p){
         vec2( 1, 1),
         vec2(-1, 1),
         vec2( 1,-1),
-        vec2(-1,-1),
-        vec2(1,0),
-        vec2(-1,0),
-        vec2(0.,1),
-        vec2(0.,-1)
+        vec2(-1,-1)
     );
 
     vec2 p3   = vec2(floor(p.x) ,floor(p.y)  );
@@ -189,14 +185,14 @@ vec2 perlin_noise_2d(vec3 p){
         vec3( 1,-1,-1),vec3(-1,-1,-1)
     );
 
-    vec3 p3    = vec3(floor(p.x) ,floor(p.y) ,floor(p.z) );
-    vec3 p3x   = vec3(p3.x + 1.0, p3.y      , p3.z );
-    vec3 p3y   = vec3(p3.x      , p3.y + 1.0, p3.z );
-    vec3 p3xy  = vec3(p3.x + 1.0, p3.y + 1.0, p3.z );
-    vec3 p3z   = vec3(p3.x      , p3.y      , p3.z + 1.0 ); 
-    vec3 p3xz  = vec3(p3.x + 1.0, p3.y      , p3.z + 1.0 );
-    vec3 p3yz  = vec3(p3.x      , p3.y + 1.0, p3.z + 1.0 );
-    vec3 p3xyz = vec3(p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3     = floor(p);//vec3(floor(p2.x) ,floor(p2.y) ,floor(p2.z));
+    vec3 p3xyz  = p3 + 1.0; //vec3( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3x    = vec3( p3xyz.x , p3.y    , p3.z    );
+    vec3 p3y    = vec3( p3.x    , p3xyz.y , p3.z    );
+    vec3 p3xy   = vec3( p3xyz.x , p3xyz.y , p3.z    );
+    vec3 p3z    = vec3( p3.x    , p3.y    , p3xyz.z ); 
+    vec3 p3xz   = vec3( p3xyz.x , p3.y    , p3xyz.z );
+    vec3 p3yz   = vec3( p3.x    , p3xyz.y , p3xyz.z );
 
     uint h    = pcg_hash(p3)   ;
     uint hx   = pcg_hash(p3x)  ;
@@ -248,11 +244,7 @@ vec3 perlin_noise_3d(vec2 p){
         vec2( 1, 1),
         vec2(-1, 1),
         vec2( 1,-1),
-        vec2(-1,-1),
-        vec2(1,0),
-        vec2(-1,0),
-        vec2(0.,1),
-        vec2(0.,-1)
+        vec2(-1,-1)
     );
 
     vec2 p3   = vec2(floor(p.x) ,floor(p.y)  );
@@ -291,14 +283,14 @@ vec3 perlin_noise_3d(vec3 p){
         vec3( 1,-1,-1),vec3(-1,-1,-1)
     );
 
-    vec3 p3    = vec3(floor(p.x) ,floor(p.y) ,floor(p.z) );
-    vec3 p3x   = vec3(p3.x + 1.0, p3.y      , p3.z );
-    vec3 p3y   = vec3(p3.x      , p3.y + 1.0, p3.z );
-    vec3 p3xy  = vec3(p3.x + 1.0, p3.y + 1.0, p3.z );
-    vec3 p3z   = vec3(p3.x      , p3.y      , p3.z + 1.0 ); 
-    vec3 p3xz  = vec3(p3.x + 1.0, p3.y      , p3.z + 1.0 );
-    vec3 p3yz  = vec3(p3.x      , p3.y + 1.0, p3.z + 1.0 );
-    vec3 p3xyz = vec3(p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3     = floor(p);//vec3(floor(p2.x) ,floor(p2.y) ,floor(p2.z));
+    vec3 p3xyz  = p3 + 1.0; //vec3( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3x    = vec3( p3xyz.x , p3.y    , p3.z    );
+    vec3 p3y    = vec3( p3.x    , p3xyz.y , p3.z    );
+    vec3 p3xy   = vec3( p3xyz.x , p3xyz.y , p3.z    );
+    vec3 p3z    = vec3( p3.x    , p3.y    , p3xyz.z ); 
+    vec3 p3xz   = vec3( p3xyz.x , p3.y    , p3xyz.z );
+    vec3 p3yz   = vec3( p3.x    , p3xyz.y , p3xyz.z );
 
     uint h    = pcg_hash(p3)   ;
     uint hx   = pcg_hash(p3x)  ;
@@ -364,23 +356,26 @@ float perlin_noise_t(vec2 p,float freqency,float phase){
 
     vec3 p2 = vec3(p.xy,GameTime * daylength + phase);
 
-    vec3 p3    = vec3(floor(p2.x) ,floor(p2.y) , floor(p2.z) );
-    vec3 p3x   = vec3(p3.x + 1.0, p3.y      , p3.z );
-    vec3 p3y   = vec3(p3.x      , p3.y + 1.0, p3.z );
-    vec3 p3xy  = vec3(p3.x + 1.0, p3.y + 1.0, p3.z );
-    vec3 p3z   = vec3(p3.x      , p3.y      , p3.z + 1.0 ); 
-    vec3 p3xz  = vec3(p3.x + 1.0, p3.y      , p3.z + 1.0 );
-    vec3 p3yz  = vec3(p3.x      , p3.y + 1.0, p3.z + 1.0 );
-    vec3 p3xyz = vec3(p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3     = floor(p2);//vec3(floor(p2.x) ,floor(p2.y) ,floor(p2.z));
+    vec3 p3xyz  = p3 + 1.0; //vec3( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3x    = vec3( p3xyz.x , p3.y    , p3.z    );
+    vec3 p3y    = vec3( p3.x    , p3xyz.y , p3.z    );
+    vec3 p3xy   = vec3( p3xyz.x , p3xyz.y , p3.z    );
+    vec3 p3z    = vec3( p3.x    , p3.y    , p3xyz.z ); 
+    vec3 p3xz   = vec3( p3xyz.x , p3.y    , p3xyz.z );
+    vec3 p3yz   = vec3( p3.x    , p3xyz.y , p3xyz.z );
 
-    uint h    = pcg_hash(vec3( p3.xy,    loop( p3.z    , daylength ) ) );
-    uint hx   = pcg_hash(vec3( p3x.xy,   loop( p3x.z   , daylength ) ) );
-    uint hy   = pcg_hash(vec3( p3y.xy,   loop( p3y.z   , daylength ) ) );
-    uint hxy  = pcg_hash(vec3( p3xy.xy,  loop( p3xy.z  , daylength ) ) );
-    uint hz   = pcg_hash(vec3( p3z.xy,   loop( p3z.z   , daylength ) ) );
-    uint hxz  = pcg_hash(vec3( p3xz.xy,  loop( p3xz.z  , daylength ) ) );
-    uint hyz  = pcg_hash(vec3( p3yz.xy,  loop( p3yz.z  , daylength ) ) );
-    uint hxyz = pcg_hash(vec3( p3xyz.xy, loop( p3xyz.z , daylength ) ) );
+    float time0 = loop( p3.z    , daylength);
+    float time1 = loop( p3xyz.z , daylength);
+
+    uint h     = pcg_hash(vec4( p3.xyz,     time0 ));
+    uint hx    = pcg_hash(vec4( p3x.xyz,    time0 ));
+    uint hy    = pcg_hash(vec4( p3y.xyz,    time0 ));
+    uint hxy   = pcg_hash(vec4( p3xy.xyz,   time0 ));
+    uint hz    = pcg_hash(vec4( p3z.xyz,    time1 ));
+    uint hxz   = pcg_hash(vec4( p3xz.xyz,   time1 ));
+    uint hyz   = pcg_hash(vec4( p3yz.xyz,   time1 ));
+    uint hxyz  = pcg_hash(vec4( p3xyz.xyz,  time1 ));
     
     vec3 v    = p2 - p3   ;
     vec3 vx   = p2 - p3x  ;
@@ -433,39 +428,42 @@ float perlin_noise_t(vec3 p,float freqency,float phase){
 
     vec4 p2 = vec4(p, GameTime * daylength + phase);
 
-    vec4 p3     = vec4(floor(p2.x) ,floor(p2.y) ,floor(p2.z), floor(p2.w));
-    vec4 p3x    = vec4( p3.x + 1.0, p3.y      , p3.z       , p3.w       );
-    vec4 p3y    = vec4( p3.x      , p3.y + 1.0, p3.z       , p3.w       );
-    vec4 p3xy   = vec4( p3.x + 1.0, p3.y + 1.0, p3.z       , p3.w       );
-    vec4 p3z    = vec4( p3.x      , p3.y      , p3.z + 1.0 , p3.w       ); 
-    vec4 p3xz   = vec4( p3.x + 1.0, p3.y      , p3.z + 1.0 , p3.w       );
-    vec4 p3yz   = vec4( p3.x      , p3.y + 1.0, p3.z + 1.0 , p3.w       );
-    vec4 p3xyz  = vec4( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 , p3.w       );
-    vec4 p3w    = vec4( p3.x      , p3.y      , p3.z       , p3.w + 1.0 );
-    vec4 p3xw   = vec4( p3.x + 1.0, p3.y      , p3.z       , p3.w + 1.0 );
-    vec4 p3yw   = vec4( p3.x      , p3.y + 1.0, p3.z       , p3.w + 1.0 );
-    vec4 p3xyw  = vec4( p3.x + 1.0, p3.y + 1.0, p3.z       , p3.w + 1.0 );
-    vec4 p3zw   = vec4( p3.x      , p3.y      , p3.z + 1.0 , p3.w + 1.0 ); 
-    vec4 p3xzw  = vec4( p3.x + 1.0, p3.y      , p3.z + 1.0 , p3.w + 1.0 );
-    vec4 p3yzw  = vec4( p3.x      , p3.y + 1.0, p3.z + 1.0 , p3.w + 1.0 );
-    vec4 p3xyzw = vec4( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 , p3.w + 1.0 );
+    vec4 p3     = floor(p2);//vec4(floor(p2.x) ,floor(p2.y) ,floor(p2.z), floor(p2.w));
+    vec4 p3xyzw = p3 + 1.0;//vec4( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 , p3.w + 1.0 );
+    vec4 p3x    = vec4( p3xyzw.x , p3.y     , p3.z     , p3.w     );
+    vec4 p3y    = vec4( p3.x     , p3xyzw.y , p3.z     , p3.w     );
+    vec4 p3xy   = vec4( p3xyzw.x , p3xyzw.y , p3.z     , p3.w     );
+    vec4 p3z    = vec4( p3.x     , p3.y     , p3xyzw.z , p3.w     ); 
+    vec4 p3xz   = vec4( p3xyzw.x , p3.y     , p3xyzw.z , p3.w     );
+    vec4 p3yz   = vec4( p3.x     , p3xyzw.y , p3xyzw.z , p3.w     );
+    vec4 p3xyz  = vec4( p3xyzw.x , p3xyzw.y , p3xyzw.z , p3.w     );
+    vec4 p3w    = vec4( p3.x     , p3.y     , p3.z     , p3xyzw.w );
+    vec4 p3xw   = vec4( p3xyzw.x , p3.y     , p3.z     , p3xyzw.w );
+    vec4 p3yw   = vec4( p3.x     , p3xyzw.y , p3.z     , p3xyzw.w );
+    vec4 p3xyw  = vec4( p3xyzw.x , p3xyzw.y , p3.z     , p3xyzw.w );
+    vec4 p3zw   = vec4( p3.x     , p3.y     , p3xyzw.z , p3xyzw.w ); 
+    vec4 p3xzw  = vec4( p3xyzw.x , p3.y     , p3xyzw.z , p3xyzw.w );
+    vec4 p3yzw  = vec4( p3.x     , p3xyzw.y , p3xyzw.z , p3xyzw.w );
 
-    uint h     = pcg_hash(vec4( p3.xyz,     loop( p3.w     , daylength) ) );
-    uint hx    = pcg_hash(vec4( p3x.xyz,    loop( p3x.w    , daylength) ) );
-    uint hy    = pcg_hash(vec4( p3y.xyz,    loop( p3y.w    , daylength) ) );
-    uint hxy   = pcg_hash(vec4( p3xy.xyz,   loop( p3xy.w   , daylength) ) );
-    uint hz    = pcg_hash(vec4( p3z.xyz,    loop( p3z.w    , daylength) ) );
-    uint hxz   = pcg_hash(vec4( p3xz.xyz,   loop( p3xz.w   , daylength) ) );
-    uint hyz   = pcg_hash(vec4( p3yz.xyz,   loop( p3yz.w   , daylength) ) );
-    uint hxyz  = pcg_hash(vec4( p3xyz.xyz,  loop( p3xyz.w  , daylength) ) );
-    uint hw    = pcg_hash(vec4( p3w.xyz,    loop( p3w.w    , daylength) ) );
-    uint hxw   = pcg_hash(vec4( p3xw.xyz,   loop( p3xw.w   , daylength) ) );
-    uint hyw   = pcg_hash(vec4( p3yw.xyz,   loop( p3yw.w   , daylength) ) );
-    uint hxyw  = pcg_hash(vec4( p3xyw.xyz,  loop( p3xyw.w  , daylength) ) );
-    uint hzw   = pcg_hash(vec4( p3zw.xyz,   loop( p3zw.w   , daylength) ) );
-    uint hxzw  = pcg_hash(vec4( p3xzw.xyz,  loop( p3xzw.w  , daylength) ) );
-    uint hyzw  = pcg_hash(vec4( p3yzw.xyz,  loop( p3yzw.w  , daylength) ) );
-    uint hxyzw = pcg_hash(vec4( p3xyzw.xyz, loop( p3xyzw.w , daylength) ) );
+    float time0 = loop( p3.w     , daylength);
+    float time1 = loop( p3xyzw.w , daylength);
+
+    uint h     = pcg_hash(vec4( p3.xyz,     time0 ));
+    uint hx    = pcg_hash(vec4( p3x.xyz,    time0 ));
+    uint hy    = pcg_hash(vec4( p3y.xyz,    time0 ));
+    uint hxy   = pcg_hash(vec4( p3xy.xyz,   time0 ));
+    uint hz    = pcg_hash(vec4( p3z.xyz,    time0 ));
+    uint hxz   = pcg_hash(vec4( p3xz.xyz,   time0 ));
+    uint hyz   = pcg_hash(vec4( p3yz.xyz,   time0 ));
+    uint hxyz  = pcg_hash(vec4( p3xyz.xyz,  time0 ));
+    uint hw    = pcg_hash(vec4( p3w.xyz,    time1 ));
+    uint hxw   = pcg_hash(vec4( p3xw.xyz,   time1 ));
+    uint hyw   = pcg_hash(vec4( p3yw.xyz,   time1 ));
+    uint hxyw  = pcg_hash(vec4( p3xyw.xyz,  time1 ));
+    uint hzw   = pcg_hash(vec4( p3zw.xyz,   time1 ));
+    uint hxzw  = pcg_hash(vec4( p3xzw.xyz,  time1 ));
+    uint hyzw  = pcg_hash(vec4( p3yzw.xyz,  time1 ));
+    uint hxyzw = pcg_hash(vec4( p3xyzw.xyz, time1 ));
     
     vec4 v     = p2 - p3    ;
     vec4 vx    = p2 - p3x   ;
@@ -542,23 +540,26 @@ vec2 perlin_noise_2d_t(vec2 p,float freqency,float phase){
 
     vec3 p2 = vec3(p.xy,GameTime * daylength + phase);
 
-    vec3 p3    = vec3(floor(p2.x) ,floor(p2.y) , floor(p2.z) );
-    vec3 p3x   = vec3(p3.x + 1.0, p3.y      , p3.z );
-    vec3 p3y   = vec3(p3.x      , p3.y + 1.0, p3.z );
-    vec3 p3xy  = vec3(p3.x + 1.0, p3.y + 1.0, p3.z );
-    vec3 p3z   = vec3(p3.x      , p3.y      , p3.z + 1.0 ); 
-    vec3 p3xz  = vec3(p3.x + 1.0, p3.y      , p3.z + 1.0 );
-    vec3 p3yz  = vec3(p3.x      , p3.y + 1.0, p3.z + 1.0 );
-    vec3 p3xyz = vec3(p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3     = floor(p2);//vec3(floor(p2.x) ,floor(p2.y) ,floor(p2.z));
+    vec3 p3xyz  = p3 + 1.0; //vec3( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3x    = vec3( p3xyz.x , p3.y    , p3.z    );
+    vec3 p3y    = vec3( p3.x    , p3xyz.y , p3.z    );
+    vec3 p3xy   = vec3( p3xyz.x , p3xyz.y , p3.z    );
+    vec3 p3z    = vec3( p3.x    , p3.y    , p3xyz.z ); 
+    vec3 p3xz   = vec3( p3xyz.x , p3.y    , p3xyz.z );
+    vec3 p3yz   = vec3( p3.x    , p3xyz.y , p3xyz.z );
 
-    uint h    = pcg_hash(vec3( p3.xy,    loop( p3.z    , daylength ) ) );
-    uint hx   = pcg_hash(vec3( p3x.xy,   loop( p3x.z   , daylength ) ) );
-    uint hy   = pcg_hash(vec3( p3y.xy,   loop( p3y.z   , daylength ) ) );
-    uint hxy  = pcg_hash(vec3( p3xy.xy,  loop( p3xy.z  , daylength ) ) );
-    uint hz   = pcg_hash(vec3( p3z.xy,   loop( p3z.z   , daylength ) ) );
-    uint hxz  = pcg_hash(vec3( p3xz.xy,  loop( p3xz.z  , daylength ) ) );
-    uint hyz  = pcg_hash(vec3( p3yz.xy,  loop( p3yz.z  , daylength ) ) );
-    uint hxyz = pcg_hash(vec3( p3xyz.xy, loop( p3xyz.z , daylength ) ) );
+    float time0 = loop( p3.z    , daylength);
+    float time1 = loop( p3xyz.z , daylength);
+
+    uint h     = pcg_hash(vec4( p3.xyz,     time0 ));
+    uint hx    = pcg_hash(vec4( p3x.xyz,    time0 ));
+    uint hy    = pcg_hash(vec4( p3y.xyz,    time0 ));
+    uint hxy   = pcg_hash(vec4( p3xy.xyz,   time0 ));
+    uint hz    = pcg_hash(vec4( p3z.xyz,    time1 ));
+    uint hxz   = pcg_hash(vec4( p3xz.xyz,   time1 ));
+    uint hyz   = pcg_hash(vec4( p3yz.xyz,   time1 ));
+    uint hxyz  = pcg_hash(vec4( p3xyz.xyz,  time1 ));
 
     vec3 v    = p2 - p3   ;
     vec3 vx   = p2 - p3x  ;
@@ -611,39 +612,42 @@ vec2 perlin_noise_2d_t(vec3 p,float freqency,float phase){
 
     vec4 p2 = vec4(p, GameTime * daylength + phase);
 
-    vec4 p3     = vec4(floor(p2.x) ,floor(p2.y) ,floor(p2.z), floor(p2.w));
-    vec4 p3x    = vec4( p3.x + 1.0, p3.y      , p3.z       , p3.w       );
-    vec4 p3y    = vec4( p3.x      , p3.y + 1.0, p3.z       , p3.w       );
-    vec4 p3xy   = vec4( p3.x + 1.0, p3.y + 1.0, p3.z       , p3.w       );
-    vec4 p3z    = vec4( p3.x      , p3.y      , p3.z + 1.0 , p3.w       ); 
-    vec4 p3xz   = vec4( p3.x + 1.0, p3.y      , p3.z + 1.0 , p3.w       );
-    vec4 p3yz   = vec4( p3.x      , p3.y + 1.0, p3.z + 1.0 , p3.w       );
-    vec4 p3xyz  = vec4( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 , p3.w       );
-    vec4 p3w    = vec4( p3.x      , p3.y      , p3.z       , p3.w + 1.0 );
-    vec4 p3xw   = vec4( p3.x + 1.0, p3.y      , p3.z       , p3.w + 1.0 );
-    vec4 p3yw   = vec4( p3.x      , p3.y + 1.0, p3.z       , p3.w + 1.0 );
-    vec4 p3xyw  = vec4( p3.x + 1.0, p3.y + 1.0, p3.z       , p3.w + 1.0 );
-    vec4 p3zw   = vec4( p3.x      , p3.y      , p3.z + 1.0 , p3.w + 1.0 ); 
-    vec4 p3xzw  = vec4( p3.x + 1.0, p3.y      , p3.z + 1.0 , p3.w + 1.0 );
-    vec4 p3yzw  = vec4( p3.x      , p3.y + 1.0, p3.z + 1.0 , p3.w + 1.0 );
-    vec4 p3xyzw = vec4( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 , p3.w + 1.0 );
+    vec4 p3     = floor(p2);//vec4(floor(p2.x) ,floor(p2.y) ,floor(p2.z), floor(p2.w));
+    vec4 p3xyzw = p3 + 1.0;//vec4( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 , p3.w + 1.0 );
+    vec4 p3x    = vec4( p3xyzw.x , p3.y     , p3.z     , p3.w     );
+    vec4 p3y    = vec4( p3.x     , p3xyzw.y , p3.z     , p3.w     );
+    vec4 p3xy   = vec4( p3xyzw.x , p3xyzw.y , p3.z     , p3.w     );
+    vec4 p3z    = vec4( p3.x     , p3.y     , p3xyzw.z , p3.w     ); 
+    vec4 p3xz   = vec4( p3xyzw.x , p3.y     , p3xyzw.z , p3.w     );
+    vec4 p3yz   = vec4( p3.x     , p3xyzw.y , p3xyzw.z , p3.w     );
+    vec4 p3xyz  = vec4( p3xyzw.x , p3xyzw.y , p3xyzw.z , p3.w     );
+    vec4 p3w    = vec4( p3.x     , p3.y     , p3.z     , p3xyzw.w );
+    vec4 p3xw   = vec4( p3xyzw.x , p3.y     , p3.z     , p3xyzw.w );
+    vec4 p3yw   = vec4( p3.x     , p3xyzw.y , p3.z     , p3xyzw.w );
+    vec4 p3xyw  = vec4( p3xyzw.x , p3xyzw.y , p3.z     , p3xyzw.w );
+    vec4 p3zw   = vec4( p3.x     , p3.y     , p3xyzw.z , p3xyzw.w ); 
+    vec4 p3xzw  = vec4( p3xyzw.x , p3.y     , p3xyzw.z , p3xyzw.w );
+    vec4 p3yzw  = vec4( p3.x     , p3xyzw.y , p3xyzw.z , p3xyzw.w );
 
-    uint h     = pcg_hash(vec4( p3.xyz,     loop( p3.w     , daylength) ));
-    uint hx    = pcg_hash(vec4( p3x.xyz,    loop( p3x.w    , daylength) ));
-    uint hy    = pcg_hash(vec4( p3y.xyz,    loop( p3y.w    , daylength) ));
-    uint hxy   = pcg_hash(vec4( p3xy.xyz,   loop( p3xy.w   , daylength) ));
-    uint hz    = pcg_hash(vec4( p3z.xyz,    loop( p3z.w    , daylength) ));
-    uint hxz   = pcg_hash(vec4( p3xz.xyz,   loop( p3xz.w   , daylength) ));
-    uint hyz   = pcg_hash(vec4( p3yz.xyz,   loop( p3yz.w   , daylength) ));
-    uint hxyz  = pcg_hash(vec4( p3xyz.xyz,  loop( p3xyz.w  , daylength) ));
-    uint hw    = pcg_hash(vec4( p3w.xyz,    loop( p3w.w    , daylength) ));
-    uint hxw   = pcg_hash(vec4( p3xw.xyz,   loop( p3xw.w   , daylength) ));
-    uint hyw   = pcg_hash(vec4( p3yw.xyz,   loop( p3yw.w   , daylength) ));
-    uint hxyw  = pcg_hash(vec4( p3xyw.xyz,  loop( p3xyw.w  , daylength) ));
-    uint hzw   = pcg_hash(vec4( p3zw.xyz,   loop( p3zw.w   , daylength) ));
-    uint hxzw  = pcg_hash(vec4( p3xzw.xyz,  loop( p3xzw.w  , daylength) ));
-    uint hyzw  = pcg_hash(vec4( p3yzw.xyz,  loop( p3yzw.w  , daylength) ));
-    uint hxyzw = pcg_hash(vec4( p3xyzw.xyz, loop( p3xyzw.w , daylength) ));
+    float time0 = loop( p3.w     , daylength);
+    float time1 = loop( p3xyzw.w , daylength);
+
+    uint h     = pcg_hash(vec4( p3.xyz,     time0 ));
+    uint hx    = pcg_hash(vec4( p3x.xyz,    time0 ));
+    uint hy    = pcg_hash(vec4( p3y.xyz,    time0 ));
+    uint hxy   = pcg_hash(vec4( p3xy.xyz,   time0 ));
+    uint hz    = pcg_hash(vec4( p3z.xyz,    time0 ));
+    uint hxz   = pcg_hash(vec4( p3xz.xyz,   time0 ));
+    uint hyz   = pcg_hash(vec4( p3yz.xyz,   time0 ));
+    uint hxyz  = pcg_hash(vec4( p3xyz.xyz,  time0 ));
+    uint hw    = pcg_hash(vec4( p3w.xyz,    time1 ));
+    uint hxw   = pcg_hash(vec4( p3xw.xyz,   time1 ));
+    uint hyw   = pcg_hash(vec4( p3yw.xyz,   time1 ));
+    uint hxyw  = pcg_hash(vec4( p3xyw.xyz,  time1 ));
+    uint hzw   = pcg_hash(vec4( p3zw.xyz,   time1 ));
+    uint hxzw  = pcg_hash(vec4( p3xzw.xyz,  time1 ));
+    uint hyzw  = pcg_hash(vec4( p3yzw.xyz,  time1 ));
+    uint hxyzw = pcg_hash(vec4( p3xyzw.xyz, time1 ));
 
     vec4 v     = p2 - p3    ;
     vec4 vx    = p2 - p3x   ;
@@ -720,23 +724,26 @@ vec3 perlin_noise_3d_t(vec2 p,float freqency,float phase){
 
     vec3 p2 = vec3(p.xy,GameTime * daylength + phase);
 
-    vec3 p3    = vec3(floor(p2.x) ,floor(p2.y) , floor(p2.z) );
-    vec3 p3x   = vec3(p3.x + 1.0, p3.y      , p3.z );
-    vec3 p3y   = vec3(p3.x      , p3.y + 1.0, p3.z );
-    vec3 p3xy  = vec3(p3.x + 1.0, p3.y + 1.0, p3.z );
-    vec3 p3z   = vec3(p3.x      , p3.y      , p3.z + 1.0 ); 
-    vec3 p3xz  = vec3(p3.x + 1.0, p3.y      , p3.z + 1.0 );
-    vec3 p3yz  = vec3(p3.x      , p3.y + 1.0, p3.z + 1.0 );
-    vec3 p3xyz = vec3(p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3     = floor(p2);//vec3(floor(p2.x) ,floor(p2.y) ,floor(p2.z));
+    vec3 p3xyz  = p3 + 1.0; //vec3( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 );
+    vec3 p3x    = vec3( p3xyz.x , p3.y    , p3.z    );
+    vec3 p3y    = vec3( p3.x    , p3xyz.y , p3.z    );
+    vec3 p3xy   = vec3( p3xyz.x , p3xyz.y , p3.z    );
+    vec3 p3z    = vec3( p3.x    , p3.y    , p3xyz.z ); 
+    vec3 p3xz   = vec3( p3xyz.x , p3.y    , p3xyz.z );
+    vec3 p3yz   = vec3( p3.x    , p3xyz.y , p3xyz.z );
 
-    uint h    = pcg_hash(vec3( p3.xy,    loop( p3.z    , daylength ) ) );
-    uint hx   = pcg_hash(vec3( p3x.xy,   loop( p3x.z   , daylength ) ) );
-    uint hy   = pcg_hash(vec3( p3y.xy,   loop( p3y.z   , daylength ) ) );
-    uint hxy  = pcg_hash(vec3( p3xy.xy,  loop( p3xy.z  , daylength ) ) );
-    uint hz   = pcg_hash(vec3( p3z.xy,   loop( p3z.z   , daylength ) ) );
-    uint hxz  = pcg_hash(vec3( p3xz.xy,  loop( p3xz.z  , daylength ) ) );
-    uint hyz  = pcg_hash(vec3( p3yz.xy,  loop( p3yz.z  , daylength ) ) );
-    uint hxyz = pcg_hash(vec3( p3xyz.xy, loop( p3xyz.z , daylength ) ) );
+    float time0 = loop( p3.z    , daylength);
+    float time1 = loop( p3xyz.z , daylength);
+
+    uint h     = pcg_hash(vec4( p3.xyz,     time0 ));
+    uint hx    = pcg_hash(vec4( p3x.xyz,    time0 ));
+    uint hy    = pcg_hash(vec4( p3y.xyz,    time0 ));
+    uint hxy   = pcg_hash(vec4( p3xy.xyz,   time0 ));
+    uint hz    = pcg_hash(vec4( p3z.xyz,    time1 ));
+    uint hxz   = pcg_hash(vec4( p3xz.xyz,   time1 ));
+    uint hyz   = pcg_hash(vec4( p3yz.xyz,   time1 ));
+    uint hxyz  = pcg_hash(vec4( p3xyz.xyz,  time1 ));
     
     vec3 v    = p2 - p3   ;
     vec3 vx   = p2 - p3x  ;
@@ -789,39 +796,42 @@ vec3 perlin_noise_3d_t(vec3 p,float freqency,float phase){
 
     vec4 p2 = vec4(p, GameTime * daylength + phase);
 
-    vec4 p3     = vec4(floor(p2.x) ,floor(p2.y) ,floor(p2.z), floor(p2.w));
-    vec4 p3x    = vec4( p3.x + 1.0, p3.y      , p3.z       , p3.w       );
-    vec4 p3y    = vec4( p3.x      , p3.y + 1.0, p3.z       , p3.w       );
-    vec4 p3xy   = vec4( p3.x + 1.0, p3.y + 1.0, p3.z       , p3.w       );
-    vec4 p3z    = vec4( p3.x      , p3.y      , p3.z + 1.0 , p3.w       ); 
-    vec4 p3xz   = vec4( p3.x + 1.0, p3.y      , p3.z + 1.0 , p3.w       );
-    vec4 p3yz   = vec4( p3.x      , p3.y + 1.0, p3.z + 1.0 , p3.w       );
-    vec4 p3xyz  = vec4( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 , p3.w       );
-    vec4 p3w    = vec4( p3.x      , p3.y      , p3.z       , p3.w + 1.0 );
-    vec4 p3xw   = vec4( p3.x + 1.0, p3.y      , p3.z       , p3.w + 1.0 );
-    vec4 p3yw   = vec4( p3.x      , p3.y + 1.0, p3.z       , p3.w + 1.0 );
-    vec4 p3xyw  = vec4( p3.x + 1.0, p3.y + 1.0, p3.z       , p3.w + 1.0 );
-    vec4 p3zw   = vec4( p3.x      , p3.y      , p3.z + 1.0 , p3.w + 1.0 ); 
-    vec4 p3xzw  = vec4( p3.x + 1.0, p3.y      , p3.z + 1.0 , p3.w + 1.0 );
-    vec4 p3yzw  = vec4( p3.x      , p3.y + 1.0, p3.z + 1.0 , p3.w + 1.0 );
-    vec4 p3xyzw = vec4( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 , p3.w + 1.0 );
+    vec4 p3     = floor(p2);//vec4(floor(p2.x) ,floor(p2.y) ,floor(p2.z), floor(p2.w));
+    vec4 p3xyzw = p3 + 1.0;//vec4( p3.x + 1.0, p3.y + 1.0, p3.z + 1.0 , p3.w + 1.0 );
+    vec4 p3x    = vec4( p3xyzw.x , p3.y     , p3.z     , p3.w     );
+    vec4 p3y    = vec4( p3.x     , p3xyzw.y , p3.z     , p3.w     );
+    vec4 p3xy   = vec4( p3xyzw.x , p3xyzw.y , p3.z     , p3.w     );
+    vec4 p3z    = vec4( p3.x     , p3.y     , p3xyzw.z , p3.w     ); 
+    vec4 p3xz   = vec4( p3xyzw.x , p3.y     , p3xyzw.z , p3.w     );
+    vec4 p3yz   = vec4( p3.x     , p3xyzw.y , p3xyzw.z , p3.w     );
+    vec4 p3xyz  = vec4( p3xyzw.x , p3xyzw.y , p3xyzw.z , p3.w     );
+    vec4 p3w    = vec4( p3.x     , p3.y     , p3.z     , p3xyzw.w );
+    vec4 p3xw   = vec4( p3xyzw.x , p3.y     , p3.z     , p3xyzw.w );
+    vec4 p3yw   = vec4( p3.x     , p3xyzw.y , p3.z     , p3xyzw.w );
+    vec4 p3xyw  = vec4( p3xyzw.x , p3xyzw.y , p3.z     , p3xyzw.w );
+    vec4 p3zw   = vec4( p3.x     , p3.y     , p3xyzw.z , p3xyzw.w ); 
+    vec4 p3xzw  = vec4( p3xyzw.x , p3.y     , p3xyzw.z , p3xyzw.w );
+    vec4 p3yzw  = vec4( p3.x     , p3xyzw.y , p3xyzw.z , p3xyzw.w );
 
-    uint h     = pcg_hash(vec4( p3.xyz,     loop( p3.w     , daylength) ));
-    uint hx    = pcg_hash(vec4( p3x.xyz,    loop( p3x.w    , daylength) ));
-    uint hy    = pcg_hash(vec4( p3y.xyz,    loop( p3y.w    , daylength) ));
-    uint hxy   = pcg_hash(vec4( p3xy.xyz,   loop( p3xy.w   , daylength) ));
-    uint hz    = pcg_hash(vec4( p3z.xyz,    loop( p3z.w    , daylength) ));
-    uint hxz   = pcg_hash(vec4( p3xz.xyz,   loop( p3xz.w   , daylength) ));
-    uint hyz   = pcg_hash(vec4( p3yz.xyz,   loop( p3yz.w   , daylength) ));
-    uint hxyz  = pcg_hash(vec4( p3xyz.xyz,  loop( p3xyz.w  , daylength) ));
-    uint hw    = pcg_hash(vec4( p3w.xyz,    loop( p3w.w    , daylength) ));
-    uint hxw   = pcg_hash(vec4( p3xw.xyz,   loop( p3xw.w   , daylength) ));
-    uint hyw   = pcg_hash(vec4( p3yw.xyz,   loop( p3yw.w   , daylength) ));
-    uint hxyw  = pcg_hash(vec4( p3xyw.xyz,  loop( p3xyw.w  , daylength) ));
-    uint hzw   = pcg_hash(vec4( p3zw.xyz,   loop( p3zw.w   , daylength) ));
-    uint hxzw  = pcg_hash(vec4( p3xzw.xyz,  loop( p3xzw.w  , daylength) ));
-    uint hyzw  = pcg_hash(vec4( p3yzw.xyz,  loop( p3yzw.w  , daylength) ));
-    uint hxyzw = pcg_hash(vec4( p3xyzw.xyz, loop( p3xyzw.w , daylength) ));
+    float time0 = loop( p3.w     , daylength);
+    float time1 = loop( p3xyzw.w , daylength);
+
+    uint h     = pcg_hash(vec4( p3.xyz,     time0 ));
+    uint hx    = pcg_hash(vec4( p3x.xyz,    time0 ));
+    uint hy    = pcg_hash(vec4( p3y.xyz,    time0 ));
+    uint hxy   = pcg_hash(vec4( p3xy.xyz,   time0 ));
+    uint hz    = pcg_hash(vec4( p3z.xyz,    time0 ));
+    uint hxz   = pcg_hash(vec4( p3xz.xyz,   time0 ));
+    uint hyz   = pcg_hash(vec4( p3yz.xyz,   time0 ));
+    uint hxyz  = pcg_hash(vec4( p3xyz.xyz,  time0 ));
+    uint hw    = pcg_hash(vec4( p3w.xyz,    time1 ));
+    uint hxw   = pcg_hash(vec4( p3xw.xyz,   time1 ));
+    uint hyw   = pcg_hash(vec4( p3yw.xyz,   time1 ));
+    uint hxyw  = pcg_hash(vec4( p3xyw.xyz,  time1 ));
+    uint hzw   = pcg_hash(vec4( p3zw.xyz,   time1 ));
+    uint hxzw  = pcg_hash(vec4( p3xzw.xyz,  time1 ));
+    uint hyzw  = pcg_hash(vec4( p3yzw.xyz,  time1 ));
+    uint hxyzw = pcg_hash(vec4( p3xyzw.xyz, time1 ));
 
     vec4 v     = p2 - p3    ;
     vec4 vx    = p2 - p3x   ;
