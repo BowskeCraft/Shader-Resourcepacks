@@ -1,12 +1,21 @@
 {
 	"pack":{
 		"min_format": 84,
-		"max_format": 86,
+		"max_format": 88,
 		"pack_name":"SHADER TEST",
 		"description":[	
 			{"text":"TEST ","color":"#DBD6A7","bold":true},
 			{"text":"\nby ","bold":false},
 			{"text":"\u03b2\u00f8\u026f\u0219\u006b\u0065's CraftRoom\n","color":"#7E7664"}
+		]
+	},
+	"overlays":{
+		"entries":[
+			{
+				"directory":"26.2",
+				"min_format":85,
+				"max_format":2147483647
+			}
 		]
 	}
 }

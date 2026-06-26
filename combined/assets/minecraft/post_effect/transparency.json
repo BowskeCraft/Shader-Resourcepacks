@@ -3,12 +3,8 @@
         "primary":{},
         "secondary":{},
         "reflection_0":{
-            "width": 720,
-            "height": 480
-        },
-        "reflection_1":{
-            "width": 720,
-            "height": 480
+            "width": 480,
+            "height": 320
         }
     },
     "passes": [
@@ -75,7 +71,7 @@
         },
         {
             "vertex_shader": "minecraft:core/screenquad",
-            "fragment_shader": "minecraft:post/screen-space-reflection",
+            "fragment_shader": "minecraft:post/reflection",
             "inputs": [
                 {
                     "sampler_name": "In",
@@ -104,7 +100,8 @@
                 },
                 {
                     "sampler_name": "Overlay",
-                    "target": "reflection_0"
+                    "target": "reflection_0",
+                    "bilinear":true
                 }
             ],
             "uniforms": {

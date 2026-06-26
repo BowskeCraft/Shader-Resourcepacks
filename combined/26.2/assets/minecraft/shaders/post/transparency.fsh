@@ -19,6 +19,9 @@ vec4 color_layers[6] = vec4[](vec4(0.0), vec4(0.0), vec4(0.0), vec4(0.0), vec4(0
 float depth_layers[6] = float[](0, 0, 0, 0, 0, 0);
 int active_layers = 0;
 
+const float alphaCorrectionLimit = 0.92;
+const float alphaCorrectionSlope = 0.05;
+
 out vec4 fragColor;
 
 void try_insert(vec4 color, float depth) {
@@ -31,7 +34,7 @@ void try_insert(vec4 color, float depth) {
 
     int jj = active_layers++;
     int ii = jj - 1;
-    while (jj > 0 && depth_layers[jj] > depth_layers[ii]) {
+    while (jj > 0 && depth_layers[jj] < depth_layers[ii]) {
         float depthTemp = depth_layers[ii];
         depth_layers[ii] = depth_layers[jj];
         depth_layers[jj] = depthTemp;
@@ -52,7 +55,7 @@ vec3 blend2(vec3 dst, vec4 src,float depth_dst,float depth_src) {
     if(src.a == 0.0){
         return dst;
     }
-    if(src.a == 1.0){
+    if(src.a >= 0.9){
         return src.rgb;
     }
 
@@ -60,7 +63,7 @@ vec3 blend2(vec3 dst, vec4 src,float depth_dst,float depth_src) {
     //float depth_src2 = -1 + 1/(1 - depth_src);
 
     //float thickness = 1 - (1 / (1 + 0.05 * (depth_dst2 - depth_src2)));
-    float thickness = 1 - ((0.95 - 0.1 * src.a * src.a) / (1 + 0.05 * (1 / (1 - depth_dst) - 1 / (1 - depth_src))));
+    float thickness = 1.0 - (alphaCorrectionLimit / (1.0 + alphaCorrectionSlope * (1.0 / depth_dst - 1.0 / depth_src)));
     //float thickness = min(0.05 * ( 1/(1 - depth_dst) - 1/(1 - depth_src)),1.0); 
 
     return (dst * (1.0 - (src.a * thickness))) + (src.rgb * thickness);
